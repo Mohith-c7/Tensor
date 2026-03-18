@@ -101,6 +101,9 @@ const feeStructureSchema = Joi.object({
   otherFee: Joi.number().min(0).precision(2).default(0)
 });
 
+// Fee payment schema aligned with actual DB schema
+
+
 const feeStructureQuerySchema = Joi.object({
   classId: id.optional(),
   academicYear: academicYear.optional()
@@ -118,8 +121,6 @@ const feePaymentSchema = Joi.object({
   transactionId: Joi.string().max(100).trim().optional(),
   remarks: Joi.string().max(500).trim().optional()
 });
-
-// ─── Exams ────────────────────────────────────────────────────────────────────
 
 const createExamSchema = Joi.object({
   name: Joi.string().max(200).trim().required(),

@@ -31,7 +31,7 @@ const configSchema = Joi.object({
   // Server Configuration
   port: Joi.number().port().default(3000),
   nodeEnv: Joi.string()
-    .valid('development', 'staging', 'production')
+    .valid('development', 'staging', 'production', 'test')
     .default('development'),
 
   // CORS Configuration

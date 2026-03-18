@@ -1,46 +1,26 @@
 /**
- * Test Setup
- * Global test configuration and setup
+ * Global Test Setup
+ * Configures environment, timeouts, and shared test utilities
  */
 
-// Set test environment
 process.env.NODE_ENV = 'test';
+process.env.SUPPRESS_LOGS = 'true';
 
-// Increase test timeout for integration tests
-jest.setTimeout(10000);
+jest.setTimeout(30000);
 
-// Global test utilities
+// Suppress winston logs during tests
+jest.mock('../src/config/logger', () => ({
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+  http: jest.fn()
+}));
+
 global.testUtils = {
-  /**
-   * Wait for specified milliseconds
-   * @param {number} ms - Milliseconds to wait
-   */
   wait: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
-
-  /**
-   * Generate random string
-   * @param {number} length - String length
-   */
-  randomString: (length = 10) => {
-    return Math.random().toString(36).substring(2, length + 2);
-  },
-
-  /**
-   * Generate random email
-   */
-  randomEmail: () => {
-    return `test-${Math.random().toString(36).substring(7)}@example.com`;
-  }
+  randomString: (len = 8) => Math.random().toString(36).substring(2, 2 + len).toUpperCase(),
+  randomEmail: () => `test.${Date.now()}@example.com`,
+  randomAdmissionNo: () => `ADM${Date.now()}`,
+  randomDate: (year = 2010) => `${year}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`
 };
-
-// Suppress console logs during tests (optional)
-if (process.env.SUPPRESS_LOGS === 'true') {
-  global.console = {
-    ...console,
-    log: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-  };
-}

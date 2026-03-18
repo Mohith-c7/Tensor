@@ -1,206 +1,225 @@
-# Tensor School ERP - Enterprise Backend System
+# Tensor School ERP — Backend API
 
-Enterprise-grade backend system for Tensor School ERP application built with Node.js, Express.js, and Supabase.
+Enterprise-grade REST API for the Tensor School management system. Built with Node.js, Express, and Supabase.
 
-## Features
+---
 
-- 🔐 Secure JWT authentication with bcrypt password hashing
-- 🛡️ Role-based access control (RBAC)
-- ✅ Comprehensive input validation using Joi
-- 🚦 Rate limiting for DDoS protection
-- 📝 Structured logging with Winston
-- 💾 In-memory caching with node-cache
-- 📊 API documentation with Swagger/OpenAPI
-- 🧪 Testing infrastructure (unit, integration, property-based)
-- 🔄 Graceful shutdown handling
-- 🌐 CORS configuration
-- 📈 Health check endpoints
-
-## Technology Stack
+## Tech Stack
 
 - **Runtime**: Node.js 18+
-- **Framework**: Express.js 4.18+
+- **Framework**: Express 4
 - **Database**: Supabase (PostgreSQL)
-- **Authentication**: JWT + bcrypt
+- **Auth**: JWT (jsonwebtoken)
 - **Validation**: Joi
-- **Logging**: Winston
-- **Caching**: node-cache
-- **Testing**: Jest + Supertest + fast-check
-- **Documentation**: Swagger UI
+- **Caching**: node-cache (in-memory)
+- **Logging**: Winston + daily-rotate-file
+- **Docs**: Swagger UI (OpenAPI 3.0)
+- **Testing**: Jest + Supertest
 
-## Prerequisites
+---
 
-- Node.js 18.x or higher
-- npm or yarn
-- Supabase account and project
+## Quick Start
 
-## Installation
+### Prerequisites
 
-1. Clone the repository and navigate to the backend directory:
-```bash
-cd backend
-```
+- Node.js 18+
+- A Supabase project with the schema applied
 
-2. Install dependencies:
+### 1. Install dependencies
+
 ```bash
 npm install
 ```
 
-3. Configure environment variables:
+### 2. Configure environment
+
 ```bash
 cp .env.example .env
 ```
 
-4. Edit `.env` file with your configuration:
-   - Set your Supabase URL and service key
-   - Generate a secure JWT secret (minimum 32 characters)
-   - Configure other settings as needed
+Edit `.env` and fill in:
 
-## Configuration
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_SERVICE_KEY` | Supabase service role key (bypasses RLS) |
+| `JWT_SECRET` | Secret key, minimum 32 characters |
+| `JWT_EXPIRES_IN` | Token expiry, e.g. `24h` |
+| `PORT` | Server port (default: `5000`) |
+| `ALLOWED_ORIGINS` | Comma-separated CORS origins |
 
-### Required Environment Variables
+### 3. Initialize the database
 
-- `SUPABASE_URL`: Your Supabase project URL
-- `SUPABASE_SERVICE_KEY`: Supabase service role key
-- `JWT_SECRET`: Secret key for JWT signing (min 32 chars)
-- `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins
+Run `src/database/schema.sql` in the Supabase SQL editor, then `src/database/seed.sql` for initial data.
 
-### Optional Environment Variables
+Default admin credentials: `admin@tensorschool.com` / `password`
 
-See `.env.example` for all available configuration options with descriptions.
+### 4. Start the server
 
-## Running the Application
-
-### Development Mode
 ```bash
+# Development (with hot reload)
 npm run dev
-```
-Runs the server with nodemon for auto-restart on file changes.
 
-### Production Mode
-```bash
+# Production
 npm start
 ```
-Runs the server in production mode.
+
+Server starts on `http://localhost:5000`  
+API docs at `http://localhost:5000/api-docs`  
+Health check at `http://localhost:5000/health`
+
+---
+
+## Docker
+
+### Build and run
+
+```bash
+# Copy and configure environment
+cp .env.example .env
+
+# Start with docker-compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f backend
+```
+
+### Build image only
+
+```bash
+docker build -t tensor-backend .
+```
+
+---
+
+## API Reference
+
+All endpoints are prefixed with `/api/v1`. Authentication uses Bearer tokens.
+
+### Authentication
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| POST | `/auth/login` | Login with email/password | No |
+| POST | `/auth/verify` | Verify token validity | Yes |
+
+### Students
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| POST | `/students` | Create student | Admin |
+| GET | `/students` | List students (paginated) | Any |
+| GET | `/students/:id` | Get student by ID | Any |
+| PUT | `/students/:id` | Update student | Admin |
+| DELETE | `/students/:id` | Delete student | Admin |
+
+### Attendance
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| POST | `/attendance` | Mark bulk attendance | Teacher/Admin |
+| GET | `/attendance/student/:studentId` | Student attendance history | Teacher/Admin |
+| GET | `/attendance/class` | Class attendance by date | Teacher/Admin |
+| GET | `/attendance/stats/:studentId` | Attendance statistics | Teacher/Admin |
+
+### Fees
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| POST | `/fees/structures` | Create fee structure | Admin |
+| GET | `/fees/structures` | List fee structures | Any |
+| POST | `/fees/payments` | Record payment | Admin |
+| GET | `/fees/student/:studentId` | Student fee status | Any |
+| GET | `/fees/pending` | Pending fees report | Admin |
+
+### Exams
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| POST | `/exams` | Create exam | Admin |
+| POST | `/exams/:examId/marks` | Enter marks (bulk) | Teacher/Admin |
+| PUT | `/marks/:markId` | Update marks | Teacher/Admin |
+| GET | `/exams/student/:studentId` | Student results | Any |
+| GET | `/exams/:examId/results` | Class results + stats | Any |
+
+### Timetable
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| POST | `/timetable` | Create entry | Admin |
+| GET | `/timetable/class` | Class timetable | Any |
+| GET | `/timetable/teacher/:teacherId` | Teacher timetable | Any |
+| PUT | `/timetable/:id` | Update entry | Admin |
+| DELETE | `/timetable/:id` | Delete entry | Admin |
+
+---
 
 ## Testing
 
-### Run All Tests
 ```bash
+# All tests
 npm test
-```
 
-### Run Unit Tests
-```bash
-npm run test:unit
-```
-
-### Run Integration Tests
-```bash
+# Integration tests only
 npm run test:integration
-```
 
-### Run Property-Based Tests
-```bash
-npm run test:property
-```
+# Unit tests only
+npm run test:unit
 
-### Run Tests with Coverage
-```bash
+# With coverage report
 npm run test:coverage
 ```
+
+Coverage threshold: 80% across branches, functions, lines, and statements.
+
+---
 
 ## Project Structure
 
 ```
-backend/
-├── src/
-│   ├── config/           # Configuration files
-│   │   ├── index.js      # Main config loader with validation
-│   │   ├── database.js   # Supabase client configuration
-│   │   ├── cache.js      # Cache configuration
-│   │   └── logger.js     # Winston logger configuration
-│   ├── middleware/       # Express middleware
-│   ├── services/         # Business logic layer
-│   ├── routes/           # API route definitions
-│   ├── models/           # Data models and schemas
-│   ├── utils/            # Utility functions
-│   └── docs/             # API documentation
-├── tests/
-│   ├── unit/             # Unit tests
-│   ├── integration/      # Integration tests
-│   └── property/         # Property-based tests
-├── logs/                 # Log files (auto-generated)
-├── .env                  # Environment variables (gitignored)
-├── .env.example          # Environment template
-├── package.json          # Dependencies and scripts
-└── jest.config.js        # Test configuration
+src/
+├── app.js              # Express app setup
+├── server.js           # Entry point, graceful shutdown
+├── config/
+│   ├── index.js        # Env config with validation
+│   ├── database.js     # Supabase client
+│   ├── cache.js        # node-cache setup
+│   └── logger.js       # Winston logger
+├── middleware/
+│   ├── auth.js         # JWT authentication
+│   ├── rbac.js         # Role-based access control
+│   ├── cors.js         # CORS configuration
+│   ├── rateLimiter.js  # Rate limiting
+│   ├── validator.js    # Joi request validation
+│   ├── requestLogger.js# HTTP request/response logging
+│   └── errorHandler.js # Centralized error handling
+├── services/           # Business logic layer
+├── routes/             # Express route handlers
+├── models/
+│   └── schemas.js      # Joi validation schemas
+├── utils/
+│   ├── errors.js       # Custom error classes
+│   ├── cache.js        # Cache service
+│   ├── database.js     # DB utilities (retry, health)
+│   ├── audit.js        # Audit logging
+│   └── serializer.js   # Response formatting
+├── docs/
+│   └── swagger.js      # OpenAPI 3.0 spec
+└── database/
+    ├── schema.sql       # Database schema
+    └── seed.sql         # Seed data
 ```
 
-## API Documentation
+---
 
-Once the server is running, API documentation is available at:
-- Swagger UI: `http://localhost:3000/api-docs` (coming soon)
+## Security
 
-## Health Check
-
-Check system health at:
-```
-GET /health
-```
-
-## Logging
-
-Logs are written to:
-- Console (formatted for readability)
-- `logs/application-YYYY-MM-DD.log` (all logs)
-- `logs/error-YYYY-MM-DD.log` (errors only)
-- `logs/exceptions-YYYY-MM-DD.log` (uncaught exceptions)
-- `logs/rejections-YYYY-MM-DD.log` (unhandled rejections)
-
-Logs are automatically rotated daily and retained for 30 days.
-
-## Security Best Practices
-
-1. **Never commit** `.env` files with real credentials
-2. Use strong JWT secrets (minimum 32 characters)
-3. Keep Supabase service key secure
-4. Configure CORS properly for your frontend domains
-5. Use HTTPS in production
-6. Regularly update dependencies
-7. Review and adjust rate limiting settings
-
-## Development Guidelines
-
-1. Follow the existing code structure
-2. Write tests for new features
-3. Use meaningful commit messages
-4. Keep functions small and focused
-5. Document complex logic
-6. Handle errors appropriately
-7. Log important operations
-
-## Troubleshooting
-
-### Configuration Errors
-If you see "Configuration validation failed", check that:
-- All required environment variables are set
-- JWT_SECRET is at least 32 characters
-- SUPABASE_URL is a valid URL
-- Environment variable types are correct
-
-### Database Connection Issues
-- Verify Supabase URL and service key
-- Check network connectivity
-- Ensure Supabase project is active
-
-### Port Already in Use
-Change the PORT in `.env` file or stop the process using the port.
-
-## License
-
-Proprietary - Tensor School ERP
-
-## Support
-
-For issues and questions, contact the development team.
+- JWT tokens expire in 24 hours
+- Passwords hashed with bcrypt (10 salt rounds)
+- Rate limiting: 5 auth attempts / 15 min, 100 API requests / 15 min
+- CORS restricted to configured origins
+- All inputs validated and sanitized via Joi
+- Role-based access control (admin / teacher)
+- Audit logs for all CREATE/UPDATE/DELETE operations
+- No stack traces exposed in production responses

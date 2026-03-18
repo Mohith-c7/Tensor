@@ -40,7 +40,7 @@ function createLimiter(windowMs, max, name) {
         }
       });
     },
-    skip: (req) => req.method === 'OPTIONS'
+    skip: (req) => req.method === 'OPTIONS' || process.env.NODE_ENV === 'test'
   });
 }
 

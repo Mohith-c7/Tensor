@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: tensor-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5000}:5000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 5000
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5173}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      AUTH_RATE_LIMIT_WINDOW: ${AUTH_RATE_LIMIT_WINDOW:-900000}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-5}
+      API_RATE_LIMIT_WINDOW: ${API_RATE_LIMIT_WINDOW:-900000}
+      API_RATE_LIMIT_MAX: ${API_RATE_LIMIT_MAX:-100}
+      CACHE_DEFAULT_TTL: ${CACHE_DEFAULT_TTL:-3600}
+      CACHE_CLASS_TTL: ${CACHE_CLASS_TTL:-3600}
+      CACHE_FEE_TTL: ${CACHE_FEE_TTL:-86400}
+      DEFAULT_PAGE_SIZE: ${DEFAULT_PAGE_SIZE:-20}
+      MAX_PAGE_SIZE: ${MAX_PAGE_SIZE:-100}
+      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS:-10}
+      SHUTDOWN_TIMEOUT: ${SHUTDOWN_TIMEOUT:-30000}
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - tensor-network
+
+networks:
+  tensor-network:
+    driver: bridge
