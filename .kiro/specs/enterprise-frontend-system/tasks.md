@@ -433,51 +433,51 @@ Bottom-up implementation: project scaffolding → design system → services →
   - [x] 13.2 Create `frontend/src/components/data-display/VirtualList.tsx`
     - Wrap `react-window` `FixedSizeList`; props: `items`, `itemHeight`, `renderItem`, `overscan?: 10`
     - _Requirements: 6.6, 13.5_
-  - [ ] 13.3 Write property test for Virtual List Threshold (Property 25)
+  - [x] 13.3 Write property test for Virtual List Threshold (Property 25)
     - **Property 25: Virtual List Threshold**
     - **Validates: Requirements 6.6, 13.5**
     - Lists > 100 items render VirtualList; lists ≤ 100 items render DataTable
-  - [ ] 13.4 Create `frontend/src/components/data-display/KPICard.tsx`
+  - [x] 13.4 Create `frontend/src/components/data-display/KPICard.tsx`
     - Props: `title`, `value`, `icon`, `trend?`, `onClick?`, `loading?`
     - Show `SkeletonLoader` variant `kpi-card` when loading; navigate on click
     - _Requirements: 5.1, 5.8_
-  - [ ] 13.5 Create `frontend/src/components/data-display/AttendanceCalendar.tsx`
+  - [x] 13.5 Create `frontend/src/components/data-display/AttendanceCalendar.tsx`
     - Monthly calendar grid; color-code dates: green=present, red=absent, yellow=late, grey=excused
     - Include icon + text label alongside color (not color alone)
     - Keyboard navigable with arrow keys
     - _Requirements: 7.7, 7.13, 14.9, 14.12_
-  - [ ] 13.6 Create `frontend/src/components/data-display/AttendanceGrid.tsx`
+  - [x] 13.6 Create `frontend/src/components/data-display/AttendanceGrid.tsx`
     - Display all students in class/section with name, admission number, status selector per row
     - "Mark All Present" bulk action button
     - Keyboard navigable between cells
     - _Requirements: 7.3, 7.4, 14.12_
-  - [ ] 13.7 Create `frontend/src/components/data-display/MarksTable.tsx`
+  - [x] 13.7 Create `frontend/src/components/data-display/MarksTable.tsx`
     - Columns: student name, admission number, marks obtained (editable input), absent toggle, remarks
     - Validate each entry: non-negative, ≤ maxMarks, empty when absent
     - Show pass/fail indicator per row based on passingMarks
     - Show "edited" visual indicator on rows modified after initial entry
     - _Requirements: 9.5, 9.6, 9.8, 9.12_
-  - [ ] 13.8 Create `frontend/src/components/data-display/TimetableGrid.tsx`
+  - [x] 13.8 Create `frontend/src/components/data-display/TimetableGrid.tsx`
     - Weekly table: days (Mon–Sat) as columns, period numbers as rows
     - Highlight current day column with primary color tint
     - Empty cell click → open create dialog; existing cell click → open edit dialog
     - Keyboard navigable with arrow keys
     - _Requirements: 10.1, 10.10, 14.12_
-  - [ ] 13.9 Create `frontend/src/components/data-display/charts/AttendanceTrendChart.tsx`
+  - [x] 13.9 Create `frontend/src/components/data-display/charts/AttendanceTrendChart.tsx`
     - Recharts `LineChart` showing daily attendance % for past 30 days
     - Lazy-loaded via `React.lazy`
     - _Requirements: 5.3, 13.8_
-  - [ ] 13.10 Create `frontend/src/components/data-display/charts/FeeCollectionChart.tsx`
+  - [x] 13.10 Create `frontend/src/components/data-display/charts/FeeCollectionChart.tsx`
     - Recharts `BarChart` showing monthly fee collections for current academic year
     - Lazy-loaded via `React.lazy`
     - _Requirements: 5.4, 13.8_
 
-- [ ] 14. Layout components and AppShell
-  - [ ] 14.1 Create `frontend/src/components/layout/Breadcrumb.tsx`
+- [x] 14. Layout components and AppShell
+  - [x] 14.1 Create `frontend/src/components/layout/Breadcrumb.tsx`
     - Use `useMatches()` from react-router-dom; read `handle.breadcrumb` from each matched route
     - Render MUI `Breadcrumbs` with separators; update within 100ms of navigation
     - _Requirements: 4.5, 4.6_
-  - [ ] 14.2 Create `frontend/src/components/layout/NavDrawer.tsx`, `NavRail.tsx`, `BottomNav.tsx`
+  - [x] 14.2 Create `frontend/src/components/layout/NavDrawer.tsx`, `NavRail.tsx`, `BottomNav.tsx`
     - All three consume the same `NavItem[]` config array
     - Active item derived from `useLocation()`; highlight with primary color + filled indicator
     - `NavDrawer`: full drawer with icons + labels (expanded breakpoint)
@@ -486,26 +486,26 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Filter nav items by `item.roles` against current user role
     - Admin-only items: Fee Structures, Payments, Pending Fees
     - _Requirements: 4.2, 4.3, 4.4, 2.11, 3.9, 3.10, 3.11_
-  - [ ] 14.3 Create `frontend/src/components/layout/TopBar.tsx`
+  - [x] 14.3 Create `frontend/src/components/layout/TopBar.tsx`
     - Render `<header>` with: Tensor logo, current page title, theme toggle `IconButton` (aria-label), user avatar with dropdown Menu (Profile, Logout)
     - Compact breakpoint: show hamburger menu icon that opens modal NavDrawer
     - _Requirements: 4.1, 4.7, 14.3_
-  - [ ] 14.4 Create `frontend/src/components/layout/AppShell.tsx`
+  - [x] 14.4 Create `frontend/src/components/layout/AppShell.tsx`
     - Use `useMediaQuery` to switch between NavDrawer / NavRail / BottomNav
     - Render `<TopBar>` + responsive nav + `<main>` content area
     - Wrap `<main>` content in `<ErrorBoundary FallbackComponent={ErrorFallback}>`
     - _Requirements: 3.9, 3.10, 3.11, 4.1, 12.4_
-  - [ ] 14.5 Create `frontend/src/App.tsx` and `frontend/src/main.tsx`
+  - [x] 14.5 Create `frontend/src/App.tsx` and `frontend/src/main.tsx`
     - `main.tsx`: Sentry init, render `<App />`
     - `App.tsx`: `<RouterProvider>` → `<AuthProvider>` → `<ThemeProvider>` → `<ToastProvider>` → `<QueryClientProvider>` → `<ToastContainer>`
     - `frontend/src/config/sentry.ts`: Sentry init config with `beforeSend` (include role, exclude userId/PII)
     - _Requirements: 17.6, 17.7_
 
-- [ ] 15. Checkpoint — all components wired
+- [x] 15. Checkpoint — all components wired
   - Ensure all tests pass for components, layout, and routing. Ask the user if questions arise.
 
 - [ ] 16. Login page
-  - [ ] 16.1 Create `frontend/src/pages/auth/LoginPage.tsx`
+  - [x] 16.1 Create `frontend/src/pages/auth/LoginPage.tsx`
     - Form with email field (`autocomplete="email"`) and password field (`autocomplete="current-password"`)
     - Use `RHFTextField` + Zod schema for validation
     - On submit: disable button + show `CircularProgress` inside button; call `useAuth().login()`
@@ -513,7 +513,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - On error: display "Invalid email or password" (non-revealing)
     - Add `<link rel="prefetch" href="/assets/DashboardPage.js" as="script">` in `index.html`
     - _Requirements: 1.1, 1.2, 1.11, 1.12, 11.5_
-  - [ ] 16.2 Write integration tests for login flow
+  - [-] 16.2 Write integration tests for login flow
     - Test: login success → redirect, login failure → error message, submit disables button, session expired toast on 401
     - _Requirements: 16.4_
 

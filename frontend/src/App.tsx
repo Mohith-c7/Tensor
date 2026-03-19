@@ -1,29 +1,26 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Students from "./pages/Students";
-import Attendance from "./pages/Attendance";
-import Fees from "./pages/Fees";
-import Exams from "./pages/Exams";
-import Timetable from "./pages/Timetable";
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
+import { ToastContainer } from './components/feedback/ToastContainer';
+import { queryClient } from './config/queryClient';
+import { router } from './router';
 
-function App() {
+/**
+ * Root application component.
+ * Provider order: Router → Auth (inside router) → Theme → Toast → Query
+ * Requirements: 17.6, 17.7
+ */
+export function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/attendance" element={<Attendance />} />
-          <Route path="/fees" element={<Fees />} />
-          <Route path="/exams" element={<Exams />} />
-          <Route path="/timetable" element={<Timetable />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <ToastProvider>
+          <RouterProvider router={router} />
+          <ToastContainer />
+        </ToastProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
-
-export default App;

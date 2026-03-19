@@ -35,7 +35,7 @@ const TeacherTimetablePage = lazy(() => import('../pages/timetable/TeacherTimeta
 const NotFoundPage = lazy(() => import('../pages/errors/NotFoundPage'));
 const ForbiddenPage = lazy(() => import('../pages/errors/ForbiddenPage'));
 
-const AppShell = lazy(() => import('../components/layout/AppShell'));
+const AppShellLayout = lazy(() => import('../components/layout/AppShellLayout').then(m => ({ default: m.AppShellLayout })));
 
 const PageSkeleton = () => (
   <div role="status" aria-label="Loading page" style={{ minHeight: '100vh' }} />
@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: withSuspense(
       <ProtectedRoute>
-        <AppShell />
+        <AppShellLayout />
       </ProtectedRoute>
     ),
     children: [
