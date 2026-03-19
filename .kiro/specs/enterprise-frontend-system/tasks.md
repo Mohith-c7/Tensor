@@ -616,33 +616,33 @@ Bottom-up implementation: project scaffolding → design system → services →
     - _Requirements: 16.4_
 
 - [ ] 21. Exams module
-  - [-] 21.1 Create `frontend/src/pages/exams/ExamsPage.tsx`
+  - [x] 21.1 Create `frontend/src/pages/exams/ExamsPage.tsx`
     - List from `useExamList(params)`; columns: name, exam type, class, subject, max marks, passing marks, exam date
     - Filter panel: class, exam type, date range
     - Admin: "Create Exam" button (PermissionGate)
     - _Requirements: 9.1, 9.13_
-  - [ ] 21.2 Create `frontend/src/pages/exams/ExamNewPage.tsx`
+  - [x] 21.2 Create `frontend/src/pages/exams/ExamNewPage.tsx`
     - Form with `examSchema`; real-time validation that passingMarks ≤ maxMarks
     - On submit: call `useCreateExam()`, show success toast, navigate to marks entry page
     - _Requirements: 9.2, 9.3, 9.4_
-  - [ ] 21.3 Create `frontend/src/pages/exams/ExamMarksPage.tsx`
+  - [x] 21.3 Create `frontend/src/pages/exams/ExamMarksPage.tsx`
     - Validate `id` param; render `MarksTable` for exam's class
     - On submit: batch `useSubmitMarks()`, show success toast
     - Show "edited" indicator on modified rows
     - _Requirements: 9.5, 9.6, 9.7, 9.12_
-  - [ ] 21.4 Create `frontend/src/pages/exams/ExamResultsPage.tsx`
+  - [x] 21.4 Create `frontend/src/pages/exams/ExamResultsPage.tsx`
     - Validate `id` param; show class average, highest, lowest, pass count, fail count, pass percentage
     - Marks distribution histogram (Recharts BarChart, lazy-loaded)
     - _Requirements: 9.9_
-  - [ ] 21.5 Create `frontend/src/pages/exams/StudentResultsPage.tsx`
+  - [x] 21.5 Create `frontend/src/pages/exams/StudentResultsPage.tsx`
     - Validate `id` param; list all exams with marks, letter grade (from `calculateGrade`), pass/fail status
     - _Requirements: 9.10, 9.11_
-  - [ ] 21.6 Write integration tests for exam flows
+  - [x] 21.6 Write integration tests for exam flows
     - Test: create exam, marks entry success, class results display, student results with grade calculation
     - _Requirements: 16.4_
 
 - [ ] 22. Timetable module
-  - [ ] 22.1 Create `frontend/src/pages/timetable/TimetablePage.tsx`
+  - [-] 22.1 Create `frontend/src/pages/timetable/TimetablePage.tsx`
     - Class/section selector; render `TimetableGrid` from `useClassTimetable`
     - Admin: empty cell click → create dialog; existing cell click → edit dialog (PermissionGate)
     - Create/edit dialog uses `timetableEntrySchema`; conflict warning if time slot overlaps
