@@ -8,6 +8,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    env: {
+      VITE_API_BASE_URL: 'http://localhost:3000/api/v1',
+      VITE_ENV: 'test',
+    },
     coverage: {
       provider: 'v8',
       thresholds: {

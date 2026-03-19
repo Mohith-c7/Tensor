@@ -78,7 +78,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Snapshot test each MUI override variant: Button (all 5 variants), TextField (outlined/filled), Card, Dialog, Snackbar
     - _Requirements: 16.9_
 
-- [ ] 3. Auth service and context
+- [x] 3. Auth service and context
   - [x] 3.1 Create `frontend/src/services/authService.ts`
     - Implement: `storeToken(token)` → sessionStorage only, `getToken()`, `clearSession()` → `sessionStorage.clear()`
     - Implement: `decodeToken(token)` → base64url decode payload, return `DecodedToken | null` for malformed input
@@ -89,14 +89,14 @@ Bottom-up implementation: project scaffolding → design system → services →
     - **Property 2: Token Decode Invariant**
     - **Validates: Requirements 1.9, 20.5**
     - For any valid JWT string, decoded `.exp` > `.iat`, and `userId`, `role`, `exp` fields are present
-  - [-] 3.3 Write property test for Malformed Token Rejection (Property 3)
+  - [x] 3.3 Write property test for Malformed Token Rejection (Property 3)
     - **Property 3: Malformed Token Rejection**
     - **Validates: Requirements 1.10**
     - For any non-JWT string, `decodeToken` returns `null`
-  - [ ] 3.4 Write unit tests for authService
+  - [x] 3.4 Write unit tests for authService
     - Test: token storage/retrieval, decode valid JWT, decode malformed returns null, isNearExpiry, isExpired, clearSession removes all keys
     - _Requirements: 16.2_
-  - [ ] 3.5 Create `frontend/src/contexts/AuthContext.tsx`
+  - [x] 3.5 Create `frontend/src/contexts/AuthContext.tsx`
     - State machine: `status: 'initializing' | 'authenticated' | 'unauthenticated'`
     - On mount: read token from sessionStorage → call `POST /api/v1/auth/verify` → set status
     - On 401 from verify: `clearSession()`, set unauthenticated
@@ -105,195 +105,195 @@ Bottom-up implementation: project scaffolding → design system → services →
     - `useEffect` with `setInterval` every 60s: check `isNearExpiry` → show `SessionWarningModal`
     - Expose: `status`, `user`, `token`, `login`, `logout`, `isAdmin`, `isTeacher`
     - _Requirements: 1.1, 1.4, 1.5, 1.6, 1.7, 1.8_
-  - [ ] 3.6 Create `frontend/src/hooks/useAuth.ts`
+  - [x] 3.6 Create `frontend/src/hooks/useAuth.ts`
     - Consume `AuthContext`, throw if used outside provider
     - _Requirements: 19.1_
 
-- [ ] 4. API client and data serialization
-  - [ ] 4.1 Create `frontend/src/services/apiClient.ts` — Axios instance + interceptors
+- [x] 4. API client and data serialization
+  - [x] 4.1 Create `frontend/src/services/apiClient.ts` — Axios instance + interceptors
     - Create Axios instance: `baseURL` from `env.API_BASE_URL`, `Content-Type: application/json`, `timeout: 30_000`
     - Request interceptor: inject `Authorization: Bearer <token>` from `authService.getToken()`
     - Response interceptor (success): normalize to `{ data, error: null, status }`, run `parseDates()` on response data
     - Response interceptor (error): extract `status`, `message`, `code`; on 401 call `authService.clearSession()` and dispatch `auth:session-expired` event; throw `ApiError(status, message, code)`
     - Dev-only request logging (never log Authorization header value)
     - _Requirements: 1.3, 12.6, 12.7, 15.4, 15.6, 18.1, 18.2, 18.3, 18.9_
-  - [ ] 4.2 Implement `parseDates()` helper and `fetchPaginated<T>()` in `apiClient.ts`
+  - [x] 4.2 Implement `parseDates()` helper and `fetchPaginated<T>()` in `apiClient.ts`
     - `parseDates`: recursively walk response object, convert ISO date strings to `Date` objects
     - `fetchPaginated<T>(url, params, signal)`: call `apiClient.get`, extract `data` array and `pagination` object, return `PaginatedResponse<T>`
     - _Requirements: 18.4, 18.8_
-  - [ ] 4.3 Create `frontend/src/services/prettyPrinter.ts`
+  - [x] 4.3 Create `frontend/src/services/prettyPrinter.ts`
     - `formatDate(date)` → `dd/MM/yyyy` display format
     - `toApiDate(date)` → `yyyy-MM-dd` ISO format for API payloads
     - `parseDate(str)` → parse `dd/MM/yyyy` back to `Date`
     - `formatCurrency(amount, locale?)` → `Intl.NumberFormat` with 2 decimal places
     - `parseCurrency(str)` → strip non-numeric chars, return float
     - _Requirements: 11.12, 18.5_
-  - [ ] 4.4 Write property test for Bearer Token Injection (Property 1)
+  - [x] 4.4 Write property test for Bearer Token Injection (Property 1)
     - **Property 1: Bearer Token Injection**
     - **Validates: Requirements 1.3, 18.2**
     - For any stored token, every outgoing request Authorization header equals `"Bearer " + token`
-  - [ ] 4.5 Write property test for 401 Response Clears Session (Property 4)
+  - [x] 4.5 Write property test for 401 Response Clears Session (Property 4)
     - **Property 4: 401 Response Clears Session**
     - **Validates: Requirements 1.5, 12.6**
     - For any endpoint returning 401, interceptor calls `clearSession()` and dispatches `auth:session-expired`
-  - [ ] 4.6 Write property test for API Serializer Round-Trip (Property 13)
+  - [x] 4.6 Write property test for API Serializer Round-Trip (Property 13)
     - **Property 13: API Serializer Round-Trip**
     - **Validates: Requirements 18.6, 20.4**
     - For any valid API response object, `deserialize(serialize(r))` deeply equals `r`
-  - [ ] 4.7 Write property test for Date Round-Trip (Property 11)
+  - [x] 4.7 Write property test for Date Round-Trip (Property 11)
     - **Property 11: Date Round-Trip**
     - **Validates: Requirements 11.12, 16.7, 20.2**
     - For any valid ISO date string, `formatDate(parseDate(formatDate(new Date(s))))` round-trips correctly
-  - [ ] 4.8 Write property test for Currency Round-Trip (Property 12)
+  - [x] 4.8 Write property test for Currency Round-Trip (Property 12)
     - **Property 12: Currency Round-Trip**
     - **Validates: Requirements 11.12, 16.8, 20.3**
     - For any non-negative number with ≤ 2 decimal places, `parseCurrency(formatCurrency(n)) === n`
-  - [ ] 4.9 Write unit tests for apiClient
+  - [x] 4.9 Write unit tests for apiClient
     - Test: Bearer header injection, 401 clears session, 403 throws ApiError, retry logic (3 attempts, exponential backoff), error message extraction, AbortController cancellation
     - _Requirements: 16.3_
 
 - [ ] 5. Utility functions
-  - [ ] 5.1 Create `frontend/src/utils/gradeCalculator.ts`
+  - [x] 5.1 Create `frontend/src/utils/gradeCalculator.ts`
     - `calculateGrade(marksObtained, maxMarks): LetterGrade` — A ≥ 90%, B ≥ 75%, C ≥ 60%, D ≥ 45%, F < 45%
     - _Requirements: 9.11_
-  - [ ] 5.2 Write property test for Grade Calculator Monotonicity (Property 14)
+  - [x] 5.2 Write property test for Grade Calculator Monotonicity (Property 14)
     - **Property 14: Grade Calculator Monotonicity**
     - **Validates: Requirements 9.11, 20.6**
     - For any `a > b` in `[0, maxMarks]`, `calculateGrade(a, maxMarks) >= calculateGrade(b, maxMarks)`
-  - [ ] 5.3 Create `frontend/src/utils/attendanceCalculator.ts`
+  - [x] 5.3 Create `frontend/src/utils/attendanceCalculator.ts`
     - `calculatePercentage(records: AttendanceRecord[]): number` — present+late / total * 100, clamped to [0, 100]
     - _Requirements: 7.8_
-  - [ ] 5.4 Write property test for Attendance Percentage Bounds (Property 15)
+  - [x] 5.4 Write property test for Attendance Percentage Bounds (Property 15)
     - **Property 15: Attendance Percentage Bounds**
     - **Validates: Requirements 7.8, 20.7**
     - For any collection of attendance records, result is in `[0, 100]`
-  - [ ] 5.5 Create `frontend/src/utils/feeCalculator.ts`
+  - [x] 5.5 Create `frontend/src/utils/feeCalculator.ts`
     - `calculateOutstanding(structure: FeeStructure, payments: FeePayment[]): number` — totalFee - sum(payments), floor at 0
     - `calculateTotalFee(structure): number` — sum of all fee components
     - _Requirements: 8.3, 8.9_
-  - [ ] 5.6 Write property test for Fee Outstanding Balance Invariant (Property 17)
+  - [x] 5.6 Write property test for Fee Outstanding Balance Invariant (Property 17)
     - **Property 17: Fee Outstanding Balance Invariant**
     - **Validates: Requirements 20.9**
     - `outstandingBalance === totalFee - totalPaid` and `outstandingBalance >= 0`
-  - [ ] 5.7 Write property test for Fee Total Equals Sum of Components (Property 18)
+  - [x] 5.7 Write property test for Fee Total Equals Sum of Components (Property 18)
     - **Property 18: Fee Total Equals Sum of Components**
     - **Validates: Requirements 8.3**
     - `totalFee === tuitionFee + transportFee + activityFee + otherFee`
-  - [ ] 5.8 Create `frontend/src/utils/paginationHelper.ts`
+  - [x] 5.8 Create `frontend/src/utils/paginationHelper.ts`
     - `calculateTotalPages(total, pageSize): number` — `Math.ceil(total / pageSize)`
     - `getPageItems<T>(items, page, pageSize): T[]`
     - _Requirements: 6.5, 18.8_
-  - [ ] 5.9 Write property test for Pagination Invariant (Property 16)
+  - [x] 5.9 Write property test for Pagination Invariant (Property 16)
     - **Property 16: Pagination Invariant**
     - **Validates: Requirements 18.8, 20.8**
     - `totalPages === Math.ceil(total / pageSize)`, last page item count is `total % pageSize` or `pageSize`
-  - [ ] 5.10 Create `frontend/src/utils/sanitize.ts`
+  - [x] 5.10 Create `frontend/src/utils/sanitize.ts`
     - `sanitize(dirty: string): string` — DOMPurify with `ALLOWED_TAGS: []`, `ALLOWED_ATTR: []`
     - _Requirements: 15.2, 15.3_
-  - [ ] 5.11 Write property test for XSS Sanitization (Property 22)
+  - [x] 5.11 Write property test for XSS Sanitization (Property 22)
     - **Property 22: XSS Sanitization**
     - **Validates: Requirements 15.2**
     - For any string, `sanitize(s)` contains no `<script>`, no `javascript:`, no `on*` attributes
-  - [ ] 5.12 Create `frontend/src/utils/routeParamValidator.ts`
+  - [x] 5.12 Create `frontend/src/utils/routeParamValidator.ts`
     - `validatePositiveInt(param: string | undefined): number | null` — returns null for non-positive-integer strings
     - _Requirements: 15.8_
-  - [ ] 5.13 Write property test for Route Parameter Validation (Property 23)
+  - [x] 5.13 Write property test for Route Parameter Validation (Property 23)
     - **Property 23: Route Parameter Validation**
     - **Validates: Requirements 15.8**
     - For any string not matching `/^[1-9]\d*$/`, `validatePositiveInt` returns `null`
-  - [ ] 5.14 Create `frontend/src/utils/csvExport.ts`
+  - [x] 5.14 Create `frontend/src/utils/csvExport.ts`
     - `exportToCsv(filename, rows, headers)` — build CSV string, trigger browser download via Blob URL
     - _Requirements: 6.14, 8.10_
-  - [ ] 5.15 Write unit tests for all utility functions
+  - [x] 5.15 Write unit tests for all utility functions
     - Test gradeCalculator (all grade boundaries), attendanceCalculator (empty, all present, all absent), feeCalculator (zero payments, overpayment guard), paginationHelper (edge cases: 0 items, exact page), sanitize (script injection, event handlers), routeParamValidator (negative, zero, float, non-numeric, valid)
     - _Requirements: 16.1_
 
 - [ ] 6. Zod validation schemas
-  - [ ] 6.1 Create student form schemas in `frontend/src/schemas/studentSchemas.ts`
+  - [x] 6.1 Create student form schemas in `frontend/src/schemas/studentSchemas.ts`
     - `studentPersonalSchema`: admissionNo (required, `/^[A-Z0-9-]+$/`), firstName/lastName (2–100 chars, trimmed), dateOfBirth (age 3–25), gender enum
     - `studentContactSchema`: email (optional), phone (optional), address (optional)
     - `studentAcademicSchema`: classId, sectionId (positive), admissionDate (not future)
     - `studentParentSchema`: parentName (min 2), parentPhone (10–15 digits), parentEmail (optional email)
     - `studentFullSchema`: merge of all four schemas
     - _Requirements: 6.8, 11.1, 15.9_
-  - [ ] 6.2 Create fee schemas in `frontend/src/schemas/feeSchemas.ts`
+  - [x] 6.2 Create fee schemas in `frontend/src/schemas/feeSchemas.ts`
     - `feeStructureSchema`: classId, academicYear (`/^\d{4}-\d{4}$/`), tuitionFee (positive), transportFee/activityFee/otherFee (non-negative, default 0)
     - `paymentSchema`: studentId, academicYear, amount (positive, message "Amount must be greater than zero"), paymentDate (not future), paymentMethod enum, transactionId/remarks (optional)
     - _Requirements: 8.2, 8.12, 11.1_
-  - [ ] 6.3 Create exam schema in `frontend/src/schemas/examSchemas.ts`
+  - [x] 6.3 Create exam schema in `frontend/src/schemas/examSchemas.ts`
     - `examSchema`: name (3–200 chars), examType enum, classId, subject (2–100), maxMarks (positive int), passingMarks (positive int), examDate; `.refine` passingMarks ≤ maxMarks
     - `marksEntrySchema`: marksObtained (0 to maxMarks), isAbsent (boolean), remarks (optional); `.refine` absent → marksObtained is 0 or empty
     - _Requirements: 9.2, 9.3, 9.6, 11.1_
-  - [ ] 6.4 Create timetable schema in `frontend/src/schemas/timetableSchemas.ts`
+  - [x] 6.4 Create timetable schema in `frontend/src/schemas/timetableSchemas.ts`
     - `timetableEntrySchema`: subject (required), teacherId (positive), roomNumber (optional), startTime (`/^\d{2}:\d{2}$/`), endTime; `.refine` endTime > startTime
     - _Requirements: 10.3, 10.4, 11.1_
-  - [ ] 6.5 Write property test for Validator Idempotence (Property 8)
+  - [x] 6.5 Write property test for Validator Idempotence (Property 8)
     - **Property 8: Validator Idempotence**
     - **Validates: Requirements 20.1**
     - For any input `v`, `validate(validate(v))` produces the same result as `validate(v)`
-  - [ ] 6.6 Write property test for Name Validator Whitespace Invariance (Property 9)
+  - [x] 6.6 Write property test for Name Validator Whitespace Invariance (Property 9)
     - **Property 9: Name Validator Whitespace Invariance**
     - **Validates: Requirements 15.9, 20.10**
     - For any string where `s.trim().length` is 2–100, validator returns valid regardless of surrounding whitespace
-  - [ ] 6.7 Write property test for Amount Validator (Property 10)
+  - [x] 6.7 Write property test for Amount Validator (Property 10)
     - **Property 10: Amount Validator Rejects Non-Positive Values**
     - **Validates: Requirements 8.12, 16.6**
     - For any `n <= 0`, amount validator returns error; for any `n > 0`, returns valid
-  - [ ] 6.8 Write property test for Exam Marks Bounds (Property 19)
+  - [x] 6.8 Write property test for Exam Marks Bounds (Property 19)
     - **Property 19: Exam Marks Bounds**
     - **Validates: Requirements 9.6**
     - `marksObtained` in `[0, maxMarks]`; when `isAbsent === true`, marksObtained is 0 or empty
-  - [ ] 6.9 Write property test for Passing Marks Constraint (Property 20)
+  - [x] 6.9 Write property test for Passing Marks Constraint (Property 20)
     - **Property 20: Passing Marks Constraint**
     - **Validates: Requirements 9.3**
     - Exam schema rejects any config where `passingMarks > maxMarks`
-  - [ ] 6.10 Write property test for Timetable Time Order (Property 21)
+  - [x] 6.10 Write property test for Timetable Time Order (Property 21)
     - **Property 21: Timetable Time Order**
     - **Validates: Requirements 10.4**
     - Timetable schema rejects entries where `endTime <= startTime`
-  - [ ] 6.11 Write unit tests for all Zod schemas
+  - [x] 6.11 Write unit tests for all Zod schemas
     - Test each schema: valid input passes, each invalid field produces correct error message, `.refine` cross-field rules fire correctly
     - _Requirements: 16.1_
 
 - [ ] 7. State management — TanStack Query setup
-  - [ ] 7.1 Create `frontend/src/config/queryClient.ts`
+  - [x] 7.1 Create `frontend/src/config/queryClient.ts`
     - Configure `QueryClient`: staleTime 5min, gcTime 10min, retry logic (no retry for 4xx, max 3 for 5xx), retryDelay exponential (1s/2s/4s), `refetchOnWindowFocus: true`, `refetchOnReconnect: true`, mutations `retry: false`
     - Export `queryKeys` factory for all domains: students, attendance, fees, exams, timetable, dashboard
     - _Requirements: 12.10, 13.7, 19.3, 19.4_
-  - [ ] 7.2 Create `frontend/src/contexts/ToastContext.tsx`
+  - [x] 7.2 Create `frontend/src/contexts/ToastContext.tsx`
     - State: `Toast[]` queue, max 3 visible simultaneously
     - `showToast({ variant, message, action? })`: add to queue, auto-dismiss success/info after 4000ms, keep error/warning until dismissed
     - `dismissToast(id)`: remove from queue
     - _Requirements: 12.1, 12.2, 12.3_
-  - [ ] 7.3 Create `frontend/src/hooks/useToast.ts`
+  - [x] 7.3 Create `frontend/src/hooks/useToast.ts`
     - Consume `ToastContext`, expose `showToast`, `dismissToast`
     - _Requirements: 12.1_
-  - [ ] 7.4 Write property test for Toast Stack Limit (Property 24)
+  - [x] 7.4 Write property test for Toast Stack Limit (Property 24)
     - **Property 24: Toast Stack Limit**
     - **Validates: Requirements 12.3**
     - For any sequence of show calls, at most 3 toasts visible simultaneously; extras are queued
 
 - [ ] 8. Custom domain hooks
-  - [ ] 8.1 Create `frontend/src/hooks/useStudents.ts`
+  - [x] 8.1 Create `frontend/src/hooks/useStudents.ts`
     - `useStudentList(params)`: `useQuery` with `queryKeys.students.list(params)`, `fetchPaginated`, `keepPreviousData`
     - `useStudent(id)`: `useQuery` with `queryKeys.students.detail(id)`, enabled when `id > 0`
     - `useCreateStudent()`: `useMutation` → `POST /students`, invalidate `students.lists()`
     - `useUpdateStudent()`: `useMutation` → `PUT /students/:id`, invalidate list + detail
     - `useDeleteStudent()`: `useMutation` → `DELETE /students/:id`, invalidate list + remove detail
     - _Requirements: 6.1, 6.9, 6.12, 6.13, 19.6_
-  - [ ] 8.2 Create `frontend/src/hooks/useAttendance.ts`
+  - [x] 8.2 Create `frontend/src/hooks/useAttendance.ts`
     - `useClassAttendance(classId, sectionId, date)`: fetch existing records
     - `useStudentAttendance(studentId, start, end)`: fetch student calendar data
     - `useMarkAttendance()`: `useMutation` with optimistic update → snapshot, apply, rollback on error, invalidate on settled
     - _Requirements: 7.2, 7.5, 7.6, 11.9, 19.6_
-  - [ ] 8.3 Create `frontend/src/hooks/useFees.ts`
+  - [x] 8.3 Create `frontend/src/hooks/useFees.ts`
     - `useFeeStructures()`: fetch all structures
     - `useCreateFeeStructure()`: `useMutation` → `POST /fees/structures`, invalidate structures
     - `useStudentFeeStatus(studentId, year)`: fetch fee status + payment history
     - `usePendingFees()`: fetch pending fees report
     - `useRecordPayment()`: `useMutation` → `POST /fees/payments`, invalidate payments + studentStatus + pending + dashboard KPIs
     - _Requirements: 8.1, 8.4, 8.6, 8.7, 8.8, 19.6_
-  - [ ] 8.4 Create `frontend/src/hooks/useExams.ts`
+  - [x] 8.4 Create `frontend/src/hooks/useExams.ts`
     - `useExamList(params)`: fetch exams with filters
     - `useExam(id)`: fetch single exam
     - `useExamMarks(examId)`: fetch marks for exam
@@ -302,14 +302,14 @@ Bottom-up implementation: project scaffolding → design system → services →
     - `useCreateExam()`: `useMutation` → `POST /exams`, invalidate exam list
     - `useSubmitMarks()`: `useMutation` → batch `POST /exams/:id/marks` + `PUT /marks/:id`, invalidate marks + results + studentResults
     - _Requirements: 9.1, 9.4, 9.7, 9.9, 9.10, 19.6_
-  - [ ] 8.5 Create `frontend/src/hooks/useTimetable.ts`
+  - [x] 8.5 Create `frontend/src/hooks/useTimetable.ts`
     - `useClassTimetable(classId, sectionId)`: fetch class schedule
     - `useTeacherTimetable(teacherId)`: fetch teacher schedule
     - `useCreateTimetableEntry()`: `useMutation` → `POST /timetable`, invalidate class + teacher timetable
     - `useUpdateTimetableEntry()`: `useMutation` → `PUT /timetable/:id`, invalidate
     - `useDeleteTimetableEntry()`: `useMutation` → `DELETE /timetable/:id`, invalidate
     - _Requirements: 10.1, 10.5, 10.7, 10.8, 19.6_
-  - [ ] 8.6 Create `frontend/src/hooks/useDashboard.ts`
+  - [-] 8.6 Create `frontend/src/hooks/useDashboard.ts`
     - `useDashboardKPIs()`: `useQuery` with `refetchInterval: 5 * 60 * 1000`, `refetchIntervalInBackground: false`
     - `useAttendanceTrend()`: 30-day daily attendance data
     - `useFeeCollection()`: monthly collection data for current academic year
