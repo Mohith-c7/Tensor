@@ -95,7 +95,9 @@ function del(key) {
 function delPattern(pattern) {
   try {
     const keys = cache.keys();
-    const regex = new RegExp(pattern.replace('*', '.*'));
+    // Escape all special regex chars (including *), then replace \* with .*
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*');
+    const regex = new RegExp(`^${escaped}$`);
     const matchingKeys = keys.filter(key => regex.test(key));
     
     if (matchingKeys.length > 0) {

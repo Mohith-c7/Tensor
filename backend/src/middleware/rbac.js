@@ -28,7 +28,9 @@ function authorize(...roles) {
       });
     }
 
-    const userRoles = ROLE_HIERARCHY[req.user.role] || [];
+    const userRoles = Object.prototype.hasOwnProperty.call(ROLE_HIERARCHY, req.user.role)
+      ? ROLE_HIERARCHY[req.user.role]
+      : [];
     const hasPermission = roles.some(role => userRoles.includes(role));
 
     if (!hasPermission) {

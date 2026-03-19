@@ -1,0 +1,717 @@
+# Implementation Plan: Enterprise Frontend System
+
+## Overview
+
+Bottom-up implementation: project scaffolding → design system → services → state → components → pages → tests. Each task builds on the previous, ending with full integration. TypeScript throughout.
+
+## Tasks
+
+- [ ] 1. Project setup and configuration
+  - [ ] 1.1 Initialise Vite + React 19 + TypeScript project in `frontend/`
+    - Run `npm create vite@latest frontend -- --template react-ts`
+    - Configure `tsconfig.json`: strict mode, path aliases (`@/` → `src/`), `moduleResolution: bundler`
+    - Create `frontend/src/types/env.d.ts` with `ImportMetaEnv` declarations for all `VITE_*` vars
+    - _Requirements: 17.1, 17.2_
+  - [ ] 1.2 Install all production dependencies
+    - Install: `react@19`, `react-dom@19`, `react-router-dom@7`, `@mui/material@6`, `@mui/icons-material@6`, `@emotion/react@11`, `@emotion/styled@11`, `@tanstack/react-query@5`, `axios@1`, `react-hook-form@7`, `zod@3`, `@hookform/resolvers@3`, `recharts@2`, `react-window@1`, `dompurify@3`, `@types/dompurify@3`, `date-fns@3`, `@sentry/react@8`, `@sentry/vite-plugin@2`
+    - _Requirements: 17.1_
+  - [ ] 1.3 Install all dev dependencies
+    - Install: `vitest@2`, `@testing-library/react@16`, `@testing-library/user-event@14`, `@testing-library/jest-dom`, `msw@2`, `fast-check@3`, `@types/react-window`, `jsdom`
+    - _Requirements: 16.1_
+  - [ ] 1.4 Create `frontend/src/config/env.ts` — validated env vars
+    - Export typed constants: `API_BASE_URL`, `APP_ENV`, `SENTRY_DSN`
+    - Throw at module load time if `VITE_API_BASE_URL` is missing
+    - _Requirements: 17.3_
+  - [ ] 1.5 Create `frontend/.env.development` and `frontend/.env.production`
+    - `.env.development`: `VITE_API_BASE_URL=http://localhost:3000/api/v1`, `VITE_ENV=development`
+    - `.env.production`: `VITE_API_BASE_URL=https://api.tensor.school/api/v1`, `VITE_ENV=production`
+    - _Requirements: 17.12_
+  - [ ] 1.6 Configure `vite.config.ts` with production build settings
+    - Add `@vitejs/plugin-react`, `@sentry/vite-plugin`, path alias `@/`
+    - Configure `manualChunks`: vendor, mui, query, charts
+    - Set `chunkSizeWarningLimit: 250`, `sourcemap: true`
+    - Fail build if `VITE_API_BASE_URL` missing
+    - _Requirements: 17.1, 17.4, 17.5_
+  - [ ] 1.7 Configure `vitest.config.ts` and `src/test/setup.ts`
+    - Environment: jsdom, globals: true, setupFiles pointing to setup.ts
+    - Coverage thresholds: 80% lines/branches/functions/statements
+    - Exclude `src/types/**`, `src/**/*.d.ts`, `src/test/**`, `src/main.tsx`
+    - Setup file: import `@testing-library/jest-dom`, MSW server lifecycle hooks, sessionStorage mock
+    - _Requirements: 16.10, 16.12_
+  - [ ] 1.8 Create `frontend/src/types/api.ts` — all API interfaces
+    - Define: `LoginRequest`, `LoginResponse`, `DecodedToken`, `Student`, `CreateStudentRequest`, `StudentListParams`, `AttendanceRecord`, `AttendanceStatus`, `MarkAttendanceRequest`, `AttendanceStats`, `FeeStructure`, `FeePayment`, `StudentFeeStatus`, `Exam`, `ExamType`, `Mark`, `LetterGrade`, `ExamStatistics`, `TimetableEntry`, `DayOfWeek`, `PaginatedResponse<T>`, `ApiResponse<T>`, `ApiError` class
+    - _Requirements: 18.7_
+  - [ ] 1.9 Create `frontend/src/types/domain.ts` — domain model types
+    - Define: `NavItem`, `RouteHandle`, `PaginationState`, `SortingState`, `ColumnDef<T>`, `AuthStatus`, `ToastVariant`, `Toast`
+    - _Requirements: 19.1_
+
+- [ ] 2. Design system — MUI v6 MD3 theme
+  - [ ] 2.1 Create `frontend/src/theme/tokens.ts` — MD3 color, spacing, elevation, motion tokens
+    - Export `colorTokens` with full light and dark palettes (primary, secondary, tertiary, error, surface, background, outline tokens)
+    - Export `spacingTokens` array: `[0, 4, 8, 12, 16, 24, 32, 48, 64]`
+    - Export `elevationTokens` object with levels 0–5 as box-shadow strings
+    - Export `motionTokens`: durationShort (100ms), durationMedium (250ms), durationLong (400ms), four easing curves
+    - Export `breakpoints`: compact (0), medium (600), expanded (905)
+    - _Requirements: 3.1, 3.5, 3.6, 3.7, 3.8_
+  - [ ] 2.2 Create `frontend/src/theme/typography.ts` — type scale
+    - Define `typographyScale` with all seven levels: displayLarge, headlineMedium, titleLarge, titleMedium, bodyLarge, bodyMedium, labelLarge
+    - _Requirements: 3.4_
+  - [ ] 2.3 Create `frontend/src/theme/components.ts` — MUI component overrides
+    - Override: Button (filled/outlined/text/elevated/tonal variants), TextField, Select, Checkbox, Card, Dialog, Snackbar, DataTable, Tabs
+    - Apply MD3 rounded corners (borderRadius: 12), motion tokens to transitions
+    - _Requirements: 3.12_
+  - [ ] 2.4 Create `frontend/src/theme/index.ts` — CssVarsProvider theme export
+    - Use `experimental_extendTheme` with `colorSchemes: { light, dark }` from tokens
+    - Apply typography scale, spacing base 4px, shape borderRadius 12
+    - Import component overrides
+    - _Requirements: 3.1, 3.2_
+  - [ ] 2.5 Create `frontend/src/contexts/ThemeContext.tsx`
+    - Interface: `{ mode: 'light' | 'dark' | 'system'; setMode; resolvedMode }`
+    - Persist to `localStorage` key `tensor-theme-mode`
+    - Listen to `window.matchMedia('(prefers-color-scheme: dark)')` for system mode
+    - Pass `colorScheme` prop to `CssVarsProvider`
+    - _Requirements: 3.2, 3.3_
+  - [ ] 2.6 Create `frontend/src/hooks/useTheme.ts`
+    - Consume `ThemeContext`, re-export `mode`, `setMode`, `resolvedMode`
+    - _Requirements: 3.2_
+  - [ ]* 2.7 Write snapshot tests for Design System base components
+    - Snapshot test each MUI override variant: Button (all 5 variants), TextField (outlined/filled), Card, Dialog, Snackbar
+    - _Requirements: 16.9_
+
+- [ ] 3. Auth service and context
+  - [ ] 3.1 Create `frontend/src/services/authService.ts`
+    - Implement: `storeToken(token)` → sessionStorage only, `getToken()`, `clearSession()` → `sessionStorage.clear()`
+    - Implement: `decodeToken(token)` → base64url decode payload, return `DecodedToken | null` for malformed input
+    - Implement: `isNearExpiry(token)` → true if exp within 5 minutes, `isExpired(token)`
+    - Never log token value; never store in localStorage
+    - _Requirements: 1.1, 1.8, 1.9, 1.10, 1.13, 15.1, 15.12_
+  - [ ]* 3.2 Write property test for Token Decode Invariant (Property 2)
+    - **Property 2: Token Decode Invariant**
+    - **Validates: Requirements 1.9, 20.5**
+    - For any valid JWT string, decoded `.exp` > `.iat`, and `userId`, `role`, `exp` fields are present
+  - [ ]* 3.3 Write property test for Malformed Token Rejection (Property 3)
+    - **Property 3: Malformed Token Rejection**
+    - **Validates: Requirements 1.10**
+    - For any non-JWT string, `decodeToken` returns `null`
+  - [ ]* 3.4 Write unit tests for authService
+    - Test: token storage/retrieval, decode valid JWT, decode malformed returns null, isNearExpiry, isExpired, clearSession removes all keys
+    - _Requirements: 16.2_
+  - [ ] 3.5 Create `frontend/src/contexts/AuthContext.tsx`
+    - State machine: `status: 'initializing' | 'authenticated' | 'unauthenticated'`
+    - On mount: read token from sessionStorage → call `POST /api/v1/auth/verify` → set status
+    - On 401 from verify: `clearSession()`, set unauthenticated
+    - Implement `login(email, password)`: call `POST /api/v1/auth/login`, store token, decode user
+    - Implement `logout()`: `clearSession()`, cancel pending requests, navigate to `/login`
+    - `useEffect` with `setInterval` every 60s: check `isNearExpiry` → show `SessionWarningModal`
+    - Expose: `status`, `user`, `token`, `login`, `logout`, `isAdmin`, `isTeacher`
+    - _Requirements: 1.1, 1.4, 1.5, 1.6, 1.7, 1.8_
+  - [ ] 3.6 Create `frontend/src/hooks/useAuth.ts`
+    - Consume `AuthContext`, throw if used outside provider
+    - _Requirements: 19.1_
+
+- [ ] 4. API client and data serialization
+  - [ ] 4.1 Create `frontend/src/services/apiClient.ts` — Axios instance + interceptors
+    - Create Axios instance: `baseURL` from `env.API_BASE_URL`, `Content-Type: application/json`, `timeout: 30_000`
+    - Request interceptor: inject `Authorization: Bearer <token>` from `authService.getToken()`
+    - Response interceptor (success): normalize to `{ data, error: null, status }`, run `parseDates()` on response data
+    - Response interceptor (error): extract `status`, `message`, `code`; on 401 call `authService.clearSession()` and dispatch `auth:session-expired` event; throw `ApiError(status, message, code)`
+    - Dev-only request logging (never log Authorization header value)
+    - _Requirements: 1.3, 12.6, 12.7, 15.4, 15.6, 18.1, 18.2, 18.3, 18.9_
+  - [ ] 4.2 Implement `parseDates()` helper and `fetchPaginated<T>()` in `apiClient.ts`
+    - `parseDates`: recursively walk response object, convert ISO date strings to `Date` objects
+    - `fetchPaginated<T>(url, params, signal)`: call `apiClient.get`, extract `data` array and `pagination` object, return `PaginatedResponse<T>`
+    - _Requirements: 18.4, 18.8_
+  - [ ] 4.3 Create `frontend/src/services/prettyPrinter.ts`
+    - `formatDate(date)` → `dd/MM/yyyy` display format
+    - `toApiDate(date)` → `yyyy-MM-dd` ISO format for API payloads
+    - `parseDate(str)` → parse `dd/MM/yyyy` back to `Date`
+    - `formatCurrency(amount, locale?)` → `Intl.NumberFormat` with 2 decimal places
+    - `parseCurrency(str)` → strip non-numeric chars, return float
+    - _Requirements: 11.12, 18.5_
+  - [ ]* 4.4 Write property test for Bearer Token Injection (Property 1)
+    - **Property 1: Bearer Token Injection**
+    - **Validates: Requirements 1.3, 18.2**
+    - For any stored token, every outgoing request Authorization header equals `"Bearer " + token`
+  - [ ]* 4.5 Write property test for 401 Response Clears Session (Property 4)
+    - **Property 4: 401 Response Clears Session**
+    - **Validates: Requirements 1.5, 12.6**
+    - For any endpoint returning 401, interceptor calls `clearSession()` and dispatches `auth:session-expired`
+  - [ ]* 4.6 Write property test for API Serializer Round-Trip (Property 13)
+    - **Property 13: API Serializer Round-Trip**
+    - **Validates: Requirements 18.6, 20.4**
+    - For any valid API response object, `deserialize(serialize(r))` deeply equals `r`
+  - [ ]* 4.7 Write property test for Date Round-Trip (Property 11)
+    - **Property 11: Date Round-Trip**
+    - **Validates: Requirements 11.12, 16.7, 20.2**
+    - For any valid ISO date string, `formatDate(parseDate(formatDate(new Date(s))))` round-trips correctly
+  - [ ]* 4.8 Write property test for Currency Round-Trip (Property 12)
+    - **Property 12: Currency Round-Trip**
+    - **Validates: Requirements 11.12, 16.8, 20.3**
+    - For any non-negative number with ≤ 2 decimal places, `parseCurrency(formatCurrency(n)) === n`
+  - [ ]* 4.9 Write unit tests for apiClient
+    - Test: Bearer header injection, 401 clears session, 403 throws ApiError, retry logic (3 attempts, exponential backoff), error message extraction, AbortController cancellation
+    - _Requirements: 16.3_
+
+- [ ] 5. Utility functions
+  - [ ] 5.1 Create `frontend/src/utils/gradeCalculator.ts`
+    - `calculateGrade(marksObtained, maxMarks): LetterGrade` — A ≥ 90%, B ≥ 75%, C ≥ 60%, D ≥ 45%, F < 45%
+    - _Requirements: 9.11_
+  - [ ]* 5.2 Write property test for Grade Calculator Monotonicity (Property 14)
+    - **Property 14: Grade Calculator Monotonicity**
+    - **Validates: Requirements 9.11, 20.6**
+    - For any `a > b` in `[0, maxMarks]`, `calculateGrade(a, maxMarks) >= calculateGrade(b, maxMarks)`
+  - [ ] 5.3 Create `frontend/src/utils/attendanceCalculator.ts`
+    - `calculatePercentage(records: AttendanceRecord[]): number` — present+late / total * 100, clamped to [0, 100]
+    - _Requirements: 7.8_
+  - [ ]* 5.4 Write property test for Attendance Percentage Bounds (Property 15)
+    - **Property 15: Attendance Percentage Bounds**
+    - **Validates: Requirements 7.8, 20.7**
+    - For any collection of attendance records, result is in `[0, 100]`
+  - [ ] 5.5 Create `frontend/src/utils/feeCalculator.ts`
+    - `calculateOutstanding(structure: FeeStructure, payments: FeePayment[]): number` — totalFee - sum(payments), floor at 0
+    - `calculateTotalFee(structure): number` — sum of all fee components
+    - _Requirements: 8.3, 8.9_
+  - [ ]* 5.6 Write property test for Fee Outstanding Balance Invariant (Property 17)
+    - **Property 17: Fee Outstanding Balance Invariant**
+    - **Validates: Requirements 20.9**
+    - `outstandingBalance === totalFee - totalPaid` and `outstandingBalance >= 0`
+  - [ ]* 5.7 Write property test for Fee Total Equals Sum of Components (Property 18)
+    - **Property 18: Fee Total Equals Sum of Components**
+    - **Validates: Requirements 8.3**
+    - `totalFee === tuitionFee + transportFee + activityFee + otherFee`
+  - [ ] 5.8 Create `frontend/src/utils/paginationHelper.ts`
+    - `calculateTotalPages(total, pageSize): number` — `Math.ceil(total / pageSize)`
+    - `getPageItems<T>(items, page, pageSize): T[]`
+    - _Requirements: 6.5, 18.8_
+  - [ ]* 5.9 Write property test for Pagination Invariant (Property 16)
+    - **Property 16: Pagination Invariant**
+    - **Validates: Requirements 18.8, 20.8**
+    - `totalPages === Math.ceil(total / pageSize)`, last page item count is `total % pageSize` or `pageSize`
+  - [ ] 5.10 Create `frontend/src/utils/sanitize.ts`
+    - `sanitize(dirty: string): string` — DOMPurify with `ALLOWED_TAGS: []`, `ALLOWED_ATTR: []`
+    - _Requirements: 15.2, 15.3_
+  - [ ]* 5.11 Write property test for XSS Sanitization (Property 22)
+    - **Property 22: XSS Sanitization**
+    - **Validates: Requirements 15.2**
+    - For any string, `sanitize(s)` contains no `<script>`, no `javascript:`, no `on*` attributes
+  - [ ] 5.12 Create `frontend/src/utils/routeParamValidator.ts`
+    - `validatePositiveInt(param: string | undefined): number | null` — returns null for non-positive-integer strings
+    - _Requirements: 15.8_
+  - [ ]* 5.13 Write property test for Route Parameter Validation (Property 23)
+    - **Property 23: Route Parameter Validation**
+    - **Validates: Requirements 15.8**
+    - For any string not matching `/^[1-9]\d*$/`, `validatePositiveInt` returns `null`
+  - [ ] 5.14 Create `frontend/src/utils/csvExport.ts`
+    - `exportToCsv(filename, rows, headers)` — build CSV string, trigger browser download via Blob URL
+    - _Requirements: 6.14, 8.10_
+  - [ ]* 5.15 Write unit tests for all utility functions
+    - Test gradeCalculator (all grade boundaries), attendanceCalculator (empty, all present, all absent), feeCalculator (zero payments, overpayment guard), paginationHelper (edge cases: 0 items, exact page), sanitize (script injection, event handlers), routeParamValidator (negative, zero, float, non-numeric, valid)
+    - _Requirements: 16.1_
+
+- [ ] 6. Zod validation schemas
+  - [ ] 6.1 Create student form schemas in `frontend/src/schemas/studentSchemas.ts`
+    - `studentPersonalSchema`: admissionNo (required, `/^[A-Z0-9-]+$/`), firstName/lastName (2–100 chars, trimmed), dateOfBirth (age 3–25), gender enum
+    - `studentContactSchema`: email (optional), phone (optional), address (optional)
+    - `studentAcademicSchema`: classId, sectionId (positive), admissionDate (not future)
+    - `studentParentSchema`: parentName (min 2), parentPhone (10–15 digits), parentEmail (optional email)
+    - `studentFullSchema`: merge of all four schemas
+    - _Requirements: 6.8, 11.1, 15.9_
+  - [ ] 6.2 Create fee schemas in `frontend/src/schemas/feeSchemas.ts`
+    - `feeStructureSchema`: classId, academicYear (`/^\d{4}-\d{4}$/`), tuitionFee (positive), transportFee/activityFee/otherFee (non-negative, default 0)
+    - `paymentSchema`: studentId, academicYear, amount (positive, message "Amount must be greater than zero"), paymentDate (not future), paymentMethod enum, transactionId/remarks (optional)
+    - _Requirements: 8.2, 8.12, 11.1_
+  - [ ] 6.3 Create exam schema in `frontend/src/schemas/examSchemas.ts`
+    - `examSchema`: name (3–200 chars), examType enum, classId, subject (2–100), maxMarks (positive int), passingMarks (positive int), examDate; `.refine` passingMarks ≤ maxMarks
+    - `marksEntrySchema`: marksObtained (0 to maxMarks), isAbsent (boolean), remarks (optional); `.refine` absent → marksObtained is 0 or empty
+    - _Requirements: 9.2, 9.3, 9.6, 11.1_
+  - [ ] 6.4 Create timetable schema in `frontend/src/schemas/timetableSchemas.ts`
+    - `timetableEntrySchema`: subject (required), teacherId (positive), roomNumber (optional), startTime (`/^\d{2}:\d{2}$/`), endTime; `.refine` endTime > startTime
+    - _Requirements: 10.3, 10.4, 11.1_
+  - [ ]* 6.5 Write property test for Validator Idempotence (Property 8)
+    - **Property 8: Validator Idempotence**
+    - **Validates: Requirements 20.1**
+    - For any input `v`, `validate(validate(v))` produces the same result as `validate(v)`
+  - [ ]* 6.6 Write property test for Name Validator Whitespace Invariance (Property 9)
+    - **Property 9: Name Validator Whitespace Invariance**
+    - **Validates: Requirements 15.9, 20.10**
+    - For any string where `s.trim().length` is 2–100, validator returns valid regardless of surrounding whitespace
+  - [ ]* 6.7 Write property test for Amount Validator (Property 10)
+    - **Property 10: Amount Validator Rejects Non-Positive Values**
+    - **Validates: Requirements 8.12, 16.6**
+    - For any `n <= 0`, amount validator returns error; for any `n > 0`, returns valid
+  - [ ]* 6.8 Write property test for Exam Marks Bounds (Property 19)
+    - **Property 19: Exam Marks Bounds**
+    - **Validates: Requirements 9.6**
+    - `marksObtained` in `[0, maxMarks]`; when `isAbsent === true`, marksObtained is 0 or empty
+  - [ ]* 6.9 Write property test for Passing Marks Constraint (Property 20)
+    - **Property 20: Passing Marks Constraint**
+    - **Validates: Requirements 9.3**
+    - Exam schema rejects any config where `passingMarks > maxMarks`
+  - [ ]* 6.10 Write property test for Timetable Time Order (Property 21)
+    - **Property 21: Timetable Time Order**
+    - **Validates: Requirements 10.4**
+    - Timetable schema rejects entries where `endTime <= startTime`
+  - [ ]* 6.11 Write unit tests for all Zod schemas
+    - Test each schema: valid input passes, each invalid field produces correct error message, `.refine` cross-field rules fire correctly
+    - _Requirements: 16.1_
+
+- [ ] 7. State management — TanStack Query setup
+  - [ ] 7.1 Create `frontend/src/config/queryClient.ts`
+    - Configure `QueryClient`: staleTime 5min, gcTime 10min, retry logic (no retry for 4xx, max 3 for 5xx), retryDelay exponential (1s/2s/4s), `refetchOnWindowFocus: true`, `refetchOnReconnect: true`, mutations `retry: false`
+    - Export `queryKeys` factory for all domains: students, attendance, fees, exams, timetable, dashboard
+    - _Requirements: 12.10, 13.7, 19.3, 19.4_
+  - [ ] 7.2 Create `frontend/src/contexts/ToastContext.tsx`
+    - State: `Toast[]` queue, max 3 visible simultaneously
+    - `showToast({ variant, message, action? })`: add to queue, auto-dismiss success/info after 4000ms, keep error/warning until dismissed
+    - `dismissToast(id)`: remove from queue
+    - _Requirements: 12.1, 12.2, 12.3_
+  - [ ] 7.3 Create `frontend/src/hooks/useToast.ts`
+    - Consume `ToastContext`, expose `showToast`, `dismissToast`
+    - _Requirements: 12.1_
+  - [ ]* 7.4 Write property test for Toast Stack Limit (Property 24)
+    - **Property 24: Toast Stack Limit**
+    - **Validates: Requirements 12.3**
+    - For any sequence of show calls, at most 3 toasts visible simultaneously; extras are queued
+
+- [ ] 8. Custom domain hooks
+  - [ ] 8.1 Create `frontend/src/hooks/useStudents.ts`
+    - `useStudentList(params)`: `useQuery` with `queryKeys.students.list(params)`, `fetchPaginated`, `keepPreviousData`
+    - `useStudent(id)`: `useQuery` with `queryKeys.students.detail(id)`, enabled when `id > 0`
+    - `useCreateStudent()`: `useMutation` → `POST /students`, invalidate `students.lists()`
+    - `useUpdateStudent()`: `useMutation` → `PUT /students/:id`, invalidate list + detail
+    - `useDeleteStudent()`: `useMutation` → `DELETE /students/:id`, invalidate list + remove detail
+    - _Requirements: 6.1, 6.9, 6.12, 6.13, 19.6_
+  - [ ] 8.2 Create `frontend/src/hooks/useAttendance.ts`
+    - `useClassAttendance(classId, sectionId, date)`: fetch existing records
+    - `useStudentAttendance(studentId, start, end)`: fetch student calendar data
+    - `useMarkAttendance()`: `useMutation` with optimistic update → snapshot, apply, rollback on error, invalidate on settled
+    - _Requirements: 7.2, 7.5, 7.6, 11.9, 19.6_
+  - [ ] 8.3 Create `frontend/src/hooks/useFees.ts`
+    - `useFeeStructures()`: fetch all structures
+    - `useCreateFeeStructure()`: `useMutation` → `POST /fees/structures`, invalidate structures
+    - `useStudentFeeStatus(studentId, year)`: fetch fee status + payment history
+    - `usePendingFees()`: fetch pending fees report
+    - `useRecordPayment()`: `useMutation` → `POST /fees/payments`, invalidate payments + studentStatus + pending + dashboard KPIs
+    - _Requirements: 8.1, 8.4, 8.6, 8.7, 8.8, 19.6_
+  - [ ] 8.4 Create `frontend/src/hooks/useExams.ts`
+    - `useExamList(params)`: fetch exams with filters
+    - `useExam(id)`: fetch single exam
+    - `useExamMarks(examId)`: fetch marks for exam
+    - `useExamResults(examId)`: fetch class statistics
+    - `useStudentResults(studentId)`: fetch student exam history
+    - `useCreateExam()`: `useMutation` → `POST /exams`, invalidate exam list
+    - `useSubmitMarks()`: `useMutation` → batch `POST /exams/:id/marks` + `PUT /marks/:id`, invalidate marks + results + studentResults
+    - _Requirements: 9.1, 9.4, 9.7, 9.9, 9.10, 19.6_
+  - [ ] 8.5 Create `frontend/src/hooks/useTimetable.ts`
+    - `useClassTimetable(classId, sectionId)`: fetch class schedule
+    - `useTeacherTimetable(teacherId)`: fetch teacher schedule
+    - `useCreateTimetableEntry()`: `useMutation` → `POST /timetable`, invalidate class + teacher timetable
+    - `useUpdateTimetableEntry()`: `useMutation` → `PUT /timetable/:id`, invalidate
+    - `useDeleteTimetableEntry()`: `useMutation` → `DELETE /timetable/:id`, invalidate
+    - _Requirements: 10.1, 10.5, 10.7, 10.8, 19.6_
+  - [ ] 8.6 Create `frontend/src/hooks/useDashboard.ts`
+    - `useDashboardKPIs()`: `useQuery` with `refetchInterval: 5 * 60 * 1000`, `refetchIntervalInBackground: false`
+    - `useAttendanceTrend()`: 30-day daily attendance data
+    - `useFeeCollection()`: monthly collection data for current academic year
+    - `useRecentActivity()`: last 10 audit events
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.9, 13.7_
+  - [ ] 8.7 Create `frontend/src/hooks/useDebounce.ts`
+    - Generic `useDebounce<T>(value: T, delay: number): T` hook using `useState` + `useEffect`
+    - _Requirements: 6.2, 13.6_
+  - [ ] 8.8 Create `frontend/src/hooks/useUnsavedChanges.ts`
+    - Accept `isDirty: boolean`; use React Router `useBlocker` to intercept navigation when dirty
+    - Show confirmation dialog before allowing navigation
+    - _Requirements: 4.9_
+  - [ ] 8.9 Create `frontend/src/hooks/useVirtualList.ts`
+    - `useVirtualList<T>(items: T[])`: return `{ shouldVirtualize: items.length > 100, items }`
+    - _Requirements: 6.6, 13.5_
+
+- [ ] 9. Checkpoint — core services complete
+  - Ensure all tests pass for services, utilities, schemas, and hooks. Ask the user if questions arise.
+
+- [ ] 10. Router setup
+  - [ ] 10.1 Create `frontend/src/router/routes.ts` — route path constants
+    - Export all route path strings as typed constants: `ROUTES.LOGIN`, `ROUTES.DASHBOARD`, `ROUTES.STUDENTS`, etc.
+    - _Requirements: 4.1_
+  - [ ] 10.2 Create `frontend/src/router/handles.ts` — breadcrumb handle definitions
+    - Export `RouteHandle` type; define breadcrumb functions for all routes
+    - _Requirements: 4.5_
+  - [ ] 10.3 Create `frontend/src/components/guards/ProtectedRoute.tsx`
+    - Read `useAuth().status`; while `initializing` render `<PageSkeleton />`
+    - Unauthenticated → `<Navigate to="/login" state={{ from: location }} />`
+    - Wrong role → `<Navigate to="/403" />`
+    - _Requirements: 2.1, 2.2, 2.8_
+  - [ ]* 10.4 Write property test for Unauthenticated Route Redirect (Property 5)
+    - **Property 5: Unauthenticated Route Redirect**
+    - **Validates: Requirements 2.1**
+    - For any protected route, navigating without token redirects to `/login` with `state.from` set
+  - [ ]* 10.5 Write property test for Role-Based Route Enforcement (Property 6)
+    - **Property 6: Role-Based Route Enforcement**
+    - **Validates: Requirements 2.2, 2.8**
+    - For any admin-only route, teacher role is redirected to `/403`
+  - [ ] 10.6 Create `frontend/src/components/guards/PermissionGate.tsx`
+    - Props: `allowedRoles`, `children`, `fallback?` (default null)
+    - Read `useAuth().user.role`; render children if role in allowedRoles, else fallback
+    - _Requirements: 2.3, 2.4, 2.5, 2.6, 2.7, 2.11_
+  - [ ]* 10.7 Write property test for Teacher Permission Gate (Property 7)
+    - **Property 7: Teacher Permission Gate**
+    - **Validates: Requirements 2.3, 2.4, 2.5, 2.6, 2.7, 2.11**
+    - For any teacher-role user, PermissionGate wrapping admin-only controls renders null
+  - [ ] 10.8 Create `frontend/src/router/index.tsx` — full route tree with lazy loading
+    - Lazy-load all page components with `React.lazy`
+    - Wrap all lazy routes in `<Suspense fallback={<PageSkeleton />}>`
+    - Apply `ProtectedRoute` with `requiredRole="admin"` to all admin-only routes
+    - Add breadcrumb handles to all routes
+    - Include `<link rel="prefetch">` for dashboard assets in `index.html`
+    - _Requirements: 2.1, 2.2, 4.5, 13.1, 13.9_
+  - [ ]* 10.9 Write integration tests for Route Guard scenarios
+    - Test: unauthenticated redirect preserves path, teacher blocked from admin routes, admin accesses all routes
+    - _Requirements: 16.5_
+
+- [ ] 11. Feedback and shared components
+  - [ ] 11.1 Create `frontend/src/components/feedback/ErrorFallback.tsx`
+    - Props: `error: Error`, `resetErrorBoundary: () => void`
+    - Render: `role="alert"`, "Something went wrong" message, "Reload Section" button
+    - _Requirements: 12.4, 12.5_
+  - [ ] 11.2 Create `frontend/src/components/feedback/OfflineBanner.tsx`
+    - Listen to `window` `offline`/`online` events; render persistent `<Alert>` with `aria-live="polite"` when offline
+    - Disable all form submissions while offline
+    - _Requirements: 12.12_
+  - [ ] 11.3 Create `frontend/src/components/feedback/Toast.tsx` and `ToastContainer.tsx`
+    - `Toast`: render MUI Snackbar with variant-based color (success=green, error=red, warning=amber, info=blue), close button, optional action button
+    - `ToastContainer`: render up to 3 toasts stacked in bottom-right corner, consume `ToastContext`
+    - _Requirements: 12.1, 12.2, 12.3_
+  - [ ] 11.4 Create `frontend/src/components/feedback/SkeletonLoader.tsx`
+    - Variants: `kpi-card`, `table-row`, `chart`, `list-item`; `count?` prop for multiple
+    - Use MUI `Skeleton` with `animation="wave"`
+    - _Requirements: 5.7, 13.3_
+  - [ ] 11.5 Create `frontend/src/components/feedback/EmptyState.tsx`
+    - Props: `illustration?`, `message`, `action?: { label, onClick }`
+    - _Requirements: 6.15, 12.11_
+  - [ ] 11.6 Create `frontend/src/components/common/ConfirmDialog.tsx`
+    - Props: `open`, `title`, `message`, `confirmLabel?`, `onConfirm`, `onCancel`, `requireTyping?`
+    - When `requireTyping` is set, disable confirm button until user types the exact string
+    - Manage focus: on open move to first focusable element; on close return focus to trigger
+    - _Requirements: 6.13, 14.2_
+  - [ ] 11.7 Create `frontend/src/components/common/StatusChip.tsx`
+    - Render MUI Chip with both color and icon (not color alone) for: active/inactive, attendance statuses, fee payment status
+    - _Requirements: 7.13, 14.9_
+  - [ ] 11.8 Create `frontend/src/components/common/PageHeader.tsx`
+    - Props: `title`, `actions?: React.ReactNode`; render as `<header>` row with title + action buttons
+    - _Requirements: 4.1_
+  - [ ] 11.9 Create `frontend/src/components/common/ExternalLink.tsx`
+    - Render `<a>` with `rel="noopener noreferrer"` and `target="_blank"`
+    - _Requirements: 15.10_
+
+- [ ] 12. Form components
+  - [ ] 12.1 Create `frontend/src/components/forms/FormErrorMessage.tsx`
+    - Render error message in error color token with error icon; set `id` for `aria-describedby` linking
+    - _Requirements: 11.3, 14.6_
+  - [ ] 12.2 Create `frontend/src/components/forms/RHFTextField.tsx`
+    - Wrap MUI `TextField` with RHF `Controller`; pass `error`, `helperText` from `fieldState`; set `aria-describedby` on error
+    - _Requirements: 11.1, 14.5, 14.6_
+  - [ ] 12.3 Create `frontend/src/components/forms/RHFSelect.tsx`
+    - Wrap MUI `Select` + `FormControl` with RHF `Controller`; handle error state
+    - _Requirements: 11.1_
+  - [ ] 12.4 Create `frontend/src/components/forms/RHFDatePicker.tsx`
+    - Wrap MUI date `TextField` (type="date") with RHF `Controller`; validate date range (1900–2100)
+    - _Requirements: 11.1, 11.10_
+  - [ ] 12.5 Create `frontend/src/components/forms/RHFCheckbox.tsx` and `RHFRadioGroup.tsx`
+    - Wrap MUI `Checkbox` / `RadioGroup` with RHF `Controller`
+    - _Requirements: 11.1_
+  - [ ] 12.6 Create `frontend/src/components/forms/MultiStepForm.tsx`
+    - Props: `steps: string[]`, `currentStep: number`, `children`
+    - Render step indicator (MUI Stepper), step content, Back/Next/Submit navigation
+    - _Requirements: 6.7_
+
+- [ ] 13. Data display components
+  - [ ] 13.1 Create `frontend/src/components/data-display/DataTable.tsx`
+    - Generic `DataTable<T>` with `columns: ColumnDef<T>[]`, `data`, `loading?`, `onRowClick?`, `selectable?`, `onSelectionChange?`, `pagination?`, `onPaginationChange?`, `sorting?`, `onSortingChange?`
+    - Render `<table>` semantic element; show `SkeletonLoader` rows when loading
+    - Support checkbox column for bulk selection
+    - _Requirements: 3.12, 6.1, 6.4, 14.4_
+  - [ ] 13.2 Create `frontend/src/components/data-display/VirtualList.tsx`
+    - Wrap `react-window` `FixedSizeList`; props: `items`, `itemHeight`, `renderItem`, `overscan?: 10`
+    - _Requirements: 6.6, 13.5_
+  - [ ]* 13.3 Write property test for Virtual List Threshold (Property 25)
+    - **Property 25: Virtual List Threshold**
+    - **Validates: Requirements 6.6, 13.5**
+    - Lists > 100 items render VirtualList; lists ≤ 100 items render DataTable
+  - [ ] 13.4 Create `frontend/src/components/data-display/KPICard.tsx`
+    - Props: `title`, `value`, `icon`, `trend?`, `onClick?`, `loading?`
+    - Show `SkeletonLoader` variant `kpi-card` when loading; navigate on click
+    - _Requirements: 5.1, 5.8_
+  - [ ] 13.5 Create `frontend/src/components/data-display/AttendanceCalendar.tsx`
+    - Monthly calendar grid; color-code dates: green=present, red=absent, yellow=late, grey=excused
+    - Include icon + text label alongside color (not color alone)
+    - Keyboard navigable with arrow keys
+    - _Requirements: 7.7, 7.13, 14.9, 14.12_
+  - [ ] 13.6 Create `frontend/src/components/data-display/AttendanceGrid.tsx`
+    - Display all students in class/section with name, admission number, status selector per row
+    - "Mark All Present" bulk action button
+    - Keyboard navigable between cells
+    - _Requirements: 7.3, 7.4, 14.12_
+  - [ ] 13.7 Create `frontend/src/components/data-display/MarksTable.tsx`
+    - Columns: student name, admission number, marks obtained (editable input), absent toggle, remarks
+    - Validate each entry: non-negative, ≤ maxMarks, empty when absent
+    - Show pass/fail indicator per row based on passingMarks
+    - Show "edited" visual indicator on rows modified after initial entry
+    - _Requirements: 9.5, 9.6, 9.8, 9.12_
+  - [ ] 13.8 Create `frontend/src/components/data-display/TimetableGrid.tsx`
+    - Weekly table: days (Mon–Sat) as columns, period numbers as rows
+    - Highlight current day column with primary color tint
+    - Empty cell click → open create dialog; existing cell click → open edit dialog
+    - Keyboard navigable with arrow keys
+    - _Requirements: 10.1, 10.10, 14.12_
+  - [ ] 13.9 Create `frontend/src/components/data-display/charts/AttendanceTrendChart.tsx`
+    - Recharts `LineChart` showing daily attendance % for past 30 days
+    - Lazy-loaded via `React.lazy`
+    - _Requirements: 5.3, 13.8_
+  - [ ] 13.10 Create `frontend/src/components/data-display/charts/FeeCollectionChart.tsx`
+    - Recharts `BarChart` showing monthly fee collections for current academic year
+    - Lazy-loaded via `React.lazy`
+    - _Requirements: 5.4, 13.8_
+
+- [ ] 14. Layout components and AppShell
+  - [ ] 14.1 Create `frontend/src/components/layout/Breadcrumb.tsx`
+    - Use `useMatches()` from react-router-dom; read `handle.breadcrumb` from each matched route
+    - Render MUI `Breadcrumbs` with separators; update within 100ms of navigation
+    - _Requirements: 4.5, 4.6_
+  - [ ] 14.2 Create `frontend/src/components/layout/NavDrawer.tsx`, `NavRail.tsx`, `BottomNav.tsx`
+    - All three consume the same `NavItem[]` config array
+    - Active item derived from `useLocation()`; highlight with primary color + filled indicator
+    - `NavDrawer`: full drawer with icons + labels (expanded breakpoint)
+    - `NavRail`: icon-only rail (medium breakpoint)
+    - `BottomNav`: MUI `BottomNavigation` (compact breakpoint)
+    - Filter nav items by `item.roles` against current user role
+    - Admin-only items: Fee Structures, Payments, Pending Fees
+    - _Requirements: 4.2, 4.3, 4.4, 2.11, 3.9, 3.10, 3.11_
+  - [ ] 14.3 Create `frontend/src/components/layout/TopBar.tsx`
+    - Render `<header>` with: Tensor logo, current page title, theme toggle `IconButton` (aria-label), user avatar with dropdown Menu (Profile, Logout)
+    - Compact breakpoint: show hamburger menu icon that opens modal NavDrawer
+    - _Requirements: 4.1, 4.7, 14.3_
+  - [ ] 14.4 Create `frontend/src/components/layout/AppShell.tsx`
+    - Use `useMediaQuery` to switch between NavDrawer / NavRail / BottomNav
+    - Render `<TopBar>` + responsive nav + `<main>` content area
+    - Wrap `<main>` content in `<ErrorBoundary FallbackComponent={ErrorFallback}>`
+    - _Requirements: 3.9, 3.10, 3.11, 4.1, 12.4_
+  - [ ] 14.5 Create `frontend/src/App.tsx` and `frontend/src/main.tsx`
+    - `main.tsx`: Sentry init, render `<App />`
+    - `App.tsx`: `<RouterProvider>` → `<AuthProvider>` → `<ThemeProvider>` → `<ToastProvider>` → `<QueryClientProvider>` → `<ToastContainer>`
+    - `frontend/src/config/sentry.ts`: Sentry init config with `beforeSend` (include role, exclude userId/PII)
+    - _Requirements: 17.6, 17.7_
+
+- [ ] 15. Checkpoint — all components wired
+  - Ensure all tests pass for components, layout, and routing. Ask the user if questions arise.
+
+- [ ] 16. Login page
+  - [ ] 16.1 Create `frontend/src/pages/auth/LoginPage.tsx`
+    - Form with email field (`autocomplete="email"`) and password field (`autocomplete="current-password"`)
+    - Use `RHFTextField` + Zod schema for validation
+    - On submit: disable button + show `CircularProgress` inside button; call `useAuth().login()`
+    - On success: prefetch dashboard KPIs, redirect to role-appropriate dashboard (or `state.from`)
+    - On error: display "Invalid email or password" (non-revealing)
+    - Add `<link rel="prefetch" href="/assets/DashboardPage.js" as="script">` in `index.html`
+    - _Requirements: 1.1, 1.2, 1.11, 1.12, 11.5_
+  - [ ]* 16.2 Write integration tests for login flow
+    - Test: login success → redirect, login failure → error message, submit disables button, session expired toast on 401
+    - _Requirements: 16.4_
+
+- [ ] 17. Dashboard page
+  - [ ] 17.1 Create `frontend/src/pages/dashboard/DashboardPage.tsx`
+    - Admin view: 5 KPI cards (Total Students, Total Teachers, Attendance Rate Today, Pending Fees Count, Upcoming Exams Count)
+    - Teacher view: 4 KPI cards (Classes Assigned, Attendance Marked Today, Upcoming Exams, Recent Marks Entries)
+    - Lazy-load `AttendanceTrendChart` and `FeeCollectionChart` (Admin only) wrapped in `<Suspense>`
+    - "Recent Activity" list (Admin only, last 10 events)
+    - "Quick Actions" section: role-specific buttons
+    - Show `SkeletonLoader` for each widget while loading; independent `ErrorBoundary` per section with "Retry" button
+    - Auto-refresh via `useDashboardKPIs` `refetchInterval`
+    - KPI card click navigates to corresponding module
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 12.4_
+
+- [ ] 18. Students module
+  - [ ] 18.1 Create `frontend/src/pages/students/StudentsPage.tsx`
+    - Paginated list via `useStudentList`; columns: Admission No, Full Name, Class, Section, Gender, Status
+    - Debounced search input (300ms) filtering by name or admission number
+    - Filter panel: class, section, gender, active status
+    - Sort controls: name A–Z/Z–A, admission number, admission date
+    - Page size selector: 10/20/50/100; default 20
+    - `useVirtualList` threshold: render `VirtualList` when > 100 items, else `DataTable`
+    - Bulk selection checkboxes + bulk action menu: Export CSV, Deactivate Selected (Admin only via `PermissionGate`)
+    - Empty state with "No students match your filters" + "Clear Filters" button
+    - Error state with "Retry" button
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.14, 6.15, 6.16_
+  - [ ] 18.2 Create `frontend/src/pages/students/StudentNewPage.tsx`
+    - Multi-step form (4 steps) using `MultiStepForm` + `FormProvider`
+    - Step 1: Personal Info (admissionNo, firstName, lastName, dateOfBirth, gender)
+    - Step 2: Contact & Address (email, phone, address)
+    - Step 3: Academic Info (classId, sectionId, admissionDate)
+    - Step 4: Parent/Guardian Info (parentName, parentPhone, parentEmail)
+    - Per-step validation via `methods.trigger(stepFields)` before advancing
+    - On submit: call `useCreateStudent()`, show success toast, redirect to new student profile
+    - On 422: map API errors to form fields via `setError`
+    - `useUnsavedChanges` to warn on navigation with dirty form
+    - _Requirements: 6.7, 6.8, 6.9, 6.10, 11.8_
+  - [ ] 18.3 Create `frontend/src/pages/students/StudentEditPage.tsx`
+    - Pre-populate form with existing student data from `useStudent(id)`
+    - Validate `id` param with `validatePositiveInt`; show 404 if invalid
+    - Same validation as create; on submit call `useUpdateStudent()`
+    - _Requirements: 6.12, 15.8_
+  - [ ] 18.4 Create `frontend/src/pages/students/StudentProfilePage.tsx`
+    - Show all student fields, attendance summary (present/absent/late counts), fee payment history, exam results
+    - Admin: "Edit" button → navigate to edit page; "Delete" button → `ConfirmDialog` requiring admission number typed
+    - Validate `id` param; show 404 if invalid
+    - _Requirements: 6.11, 6.13, 15.8_
+  - [ ]* 18.5 Write integration tests for student flows
+    - Test: student list loads, search filters, create student success, create student 422 error mapping, delete confirmation
+    - _Requirements: 16.4_
+
+- [ ] 19. Attendance module
+  - [ ] 19.1 Create `frontend/src/pages/attendance/AttendancePage.tsx`
+    - Selectors: class, section, date (with "Today" badge when date is today)
+    - On selection: fetch existing records via `useClassAttendance`, pre-populate `AttendanceGrid`
+    - Disable submission and show message for future dates
+    - On submit: call `useMarkAttendance()` (optimistic update), show success toast with record count
+    - Error state: allow retry without losing class/section/date selection
+    - _Requirements: 7.1, 7.2, 7.5, 7.6, 7.10, 7.11, 7.12_
+  - [ ] 19.2 Create `frontend/src/pages/attendance/AttendanceStudentPage.tsx`
+    - Validate `id` param; show 404 if invalid
+    - Render `AttendanceCalendar` for monthly view
+    - Render attendance statistics panel: total days, present, absent, late, excused, percentage
+    - Date range filter with start/end date pickers
+    - _Requirements: 7.7, 7.8, 7.9_
+  - [ ]* 19.3 Write integration tests for attendance flow
+    - Test: mark attendance success with optimistic update, rollback on error, future date disabled, pre-populate existing records
+    - _Requirements: 16.4_
+
+- [ ] 20. Fees module
+  - [ ] 20.1 Create `frontend/src/pages/fees/FeeStructuresPage.tsx`
+    - List from `useFeeStructures()`; columns: class, academic year, tuition, transport, activity, other, total
+    - Admin: "Add Fee Structure" button (via `PermissionGate`)
+    - _Requirements: 8.1_
+  - [ ] 20.2 Create `frontend/src/pages/fees/FeeStructureNewPage.tsx`
+    - Form with `feeStructureSchema`; real-time total_fee computed display as user types
+    - On submit: call `useCreateFeeStructure()`, show success toast, refresh list
+    - _Requirements: 8.2, 8.3, 8.4_
+  - [ ] 20.3 Create `frontend/src/pages/fees/PaymentsPage.tsx`
+    - Payments list from `useFees().payments`; columns: student, academic year, amount, date, method
+    - Admin: "Record Payment" button
+    - _Requirements: 8.5_
+  - [ ] 20.4 Create `frontend/src/pages/fees/PaymentNewPage.tsx`
+    - Form with `paymentSchema`; student searchable dropdown; amount must not exceed outstanding balance
+    - On submit: call `useRecordPayment()`, show success toast with receipt summary, update student fee status
+    - _Requirements: 8.5, 8.6_
+  - [ ] 20.5 Create `frontend/src/pages/fees/StudentFeePage.tsx`
+    - Validate `id` param; show fee structure for student's class, total paid, outstanding balance, payment history table
+    - Color indicator: green (fully paid), amber (partially paid), red (no payment)
+    - Warning banner if no fee structure exists for student's class/year, with link to create
+    - _Requirements: 8.7, 8.9, 8.11_
+  - [ ] 20.6 Create `frontend/src/pages/fees/PendingFeesPage.tsx`
+    - Fetch from `usePendingFees()`; sortable by amount due and student name
+    - "Export CSV" button using `csvExport` utility
+    - Admin-only route (PermissionGate + ProtectedRoute)
+    - _Requirements: 8.8, 8.10_
+  - [ ]* 20.7 Write integration tests for fee flows
+    - Test: fee structure create, payment record success, student fee status display, pending fees export
+    - _Requirements: 16.4_
+
+- [ ] 21. Exams module
+  - [ ] 21.1 Create `frontend/src/pages/exams/ExamsPage.tsx`
+    - List from `useExamList(params)`; columns: name, exam type, class, subject, max marks, passing marks, exam date
+    - Filter panel: class, exam type, date range
+    - Admin: "Create Exam" button (PermissionGate)
+    - _Requirements: 9.1, 9.13_
+  - [ ] 21.2 Create `frontend/src/pages/exams/ExamNewPage.tsx`
+    - Form with `examSchema`; real-time validation that passingMarks ≤ maxMarks
+    - On submit: call `useCreateExam()`, show success toast, navigate to marks entry page
+    - _Requirements: 9.2, 9.3, 9.4_
+  - [ ] 21.3 Create `frontend/src/pages/exams/ExamMarksPage.tsx`
+    - Validate `id` param; render `MarksTable` for exam's class
+    - On submit: batch `useSubmitMarks()`, show success toast
+    - Show "edited" indicator on modified rows
+    - _Requirements: 9.5, 9.6, 9.7, 9.12_
+  - [ ] 21.4 Create `frontend/src/pages/exams/ExamResultsPage.tsx`
+    - Validate `id` param; show class average, highest, lowest, pass count, fail count, pass percentage
+    - Marks distribution histogram (Recharts BarChart, lazy-loaded)
+    - _Requirements: 9.9_
+  - [ ] 21.5 Create `frontend/src/pages/exams/StudentResultsPage.tsx`
+    - Validate `id` param; list all exams with marks, letter grade (from `calculateGrade`), pass/fail status
+    - _Requirements: 9.10, 9.11_
+  - [ ]* 21.6 Write integration tests for exam flows
+    - Test: create exam, marks entry success, class results display, student results with grade calculation
+    - _Requirements: 16.4_
+
+- [ ] 22. Timetable module
+  - [ ] 22.1 Create `frontend/src/pages/timetable/TimetablePage.tsx`
+    - Class/section selector; render `TimetableGrid` from `useClassTimetable`
+    - Admin: empty cell click → create dialog; existing cell click → edit dialog (PermissionGate)
+    - Create/edit dialog uses `timetableEntrySchema`; conflict warning if time slot overlaps
+    - Delete: confirmation prompt → `useDeleteTimetableEntry()`
+    - Grid updates without full page reload after create/edit/delete
+    - _Requirements: 10.1, 10.2, 10.3, 10.5, 10.6, 10.7, 10.11_
+  - [ ] 22.2 Create `frontend/src/pages/timetable/TeacherTimetablePage.tsx`
+    - Validate `id` param; fetch via `useTeacherTimetable(teacherId)`
+    - Teacher users default to their own timetable (filtered by `useAuth().user.userId`)
+    - _Requirements: 10.8, 10.9_
+  - [ ]* 22.3 Write integration tests for timetable flows
+    - Test: create entry, edit entry, delete entry with confirmation, teacher default view
+    - _Requirements: 16.4_
+
+- [ ] 23. Error pages
+  - [ ] 23.1 Create `frontend/src/pages/errors/NotFoundPage.tsx`
+    - "404 Not Found" message with "Go Back" button (`useNavigate(-1)`)
+    - _Requirements: 12.8_
+  - [ ] 23.2 Create `frontend/src/pages/errors/ForbiddenPage.tsx`
+    - "403 Forbidden" message with "Return to Dashboard" button
+    - _Requirements: 2.2_
+
+- [ ] 24. Checkpoint — all pages complete
+  - Ensure all tests pass for all page components and module flows. Ask the user if questions arise.
+
+- [ ] 25. MSW mock setup and integration tests
+  - [ ] 25.1 Create `frontend/src/test/mocks/handlers.ts` — MSW request handlers
+    - Define handlers for all API endpoints: `POST /auth/login`, `POST /auth/verify`, `GET /students`, `POST /students`, `GET /students/:id`, `PUT /students/:id`, `DELETE /students/:id`, `GET /attendance/class`, `POST /attendance`, `GET /fees/structures`, `POST /fees/structures`, `GET /fees/payments`, `POST /fees/payments`, `GET /fees/student/:id`, `GET /fees/pending`, `GET /exams`, `POST /exams`, `GET /exams/:id/marks`, `POST /exams/:id/marks`, `PUT /marks/:id`, `GET /exams/:id/results`, `GET /exams/student/:id`, `GET /timetable`, `POST /timetable`, `PUT /timetable/:id`, `DELETE /timetable/:id`
+    - _Requirements: 16.4_
+  - [ ] 25.2 Create `frontend/src/test/mocks/server.ts` — MSW server setup
+    - `setupServer(...handlers)` for Node environment (Vitest)
+    - _Requirements: 16.4_
+  - [ ] 25.3 Create `frontend/src/test/mocks/fixtures.ts` — test data fixtures
+    - Export typed fixture objects for: admin user token, teacher user token, student list, attendance records, fee structures, payments, exams, marks, timetable entries
+    - _Requirements: 16.4_
+  - [ ] 25.4 Write integration tests for auth flow
+    - Test: login success → token stored → redirect, login failure → error message, verify on init → authenticated, verify 401 → unauthenticated redirect, logout → session cleared
+    - _Requirements: 16.4_
+  - [ ] 25.5 Write integration tests for RBAC flows
+    - Test: unauthenticated → redirect to login with `state.from`, teacher → admin route → 403 page, admin → all routes accessible, PermissionGate hides admin controls for teacher
+    - _Requirements: 16.5_
+
+- [ ] 26. Build configuration and deployment files
+  - [ ] 26.1 Create `frontend/netlify.toml`
+    - Build command, publish dir, SPA redirect `/* → /index.html`, cache headers for assets (1 year) and index.html (no-cache), CSP header
+    - _Requirements: 17.8, 17.9, 17.11_
+  - [ ] 26.2 Create `frontend/vercel.json`
+    - SPA rewrite rule, cache headers for assets and index.html
+    - _Requirements: 17.11_
+  - [ ] 26.3 Add CSP meta tag to `frontend/index.html`
+    - `default-src 'self'`, `script-src 'self'`, `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: https:`, `connect-src 'self' https://api.tensor.school https://*.sentry.io`, `font-src 'self'`, `frame-ancestors 'none'`
+    - Add `<link rel="prefetch" href="/assets/DashboardPage.js" as="script">`
+    - _Requirements: 15.5, 17.8, 13.9_
+
+- [ ] 27. Final checkpoint — full test suite and quality audit
+  - Run `vitest --run --coverage` and verify ≥ 80% line/branch/function coverage across all source files
+  - Verify all 25 property-based tests pass with fast-check
+  - Verify all integration tests pass with MSW
+  - Run `vite build` and confirm no chunk exceeds 250KB gzipped
+  - Run Lighthouse audit on login and dashboard pages; verify scores ≥ 90 for Performance, Accessibility, Best Practices
+  - Ensure all tests pass, ask the user if questions arise.
+  - _Requirements: 16.10, 16.12, 17.4, 17.10_
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for a faster MVP
+- Each task references specific requirements for traceability
+- Checkpoints at tasks 9, 15, 24, and 27 ensure incremental validation
+- Property tests (Properties 1–25) validate universal correctness invariants using fast-check
+- Integration tests use MSW to mock the backend API — no real network calls in tests
+- All page components are lazy-loaded; charts are additionally deferred within the dashboard
+- TypeScript strict mode is enforced throughout; no `any` types in production code
