@@ -6,94 +6,94 @@ Bottom-up implementation: project scaffolding → design system → services →
 
 ## Tasks
 
-- [ ] 1. Project setup and configuration
-  - [ ] 1.1 Initialise Vite + React 19 + TypeScript project in `frontend/`
+- [x] 1. Project setup and configuration
+  - [x] 1.1 Initialise Vite + React 19 + TypeScript project in `frontend/`
     - Run `npm create vite@latest frontend -- --template react-ts`
     - Configure `tsconfig.json`: strict mode, path aliases (`@/` → `src/`), `moduleResolution: bundler`
     - Create `frontend/src/types/env.d.ts` with `ImportMetaEnv` declarations for all `VITE_*` vars
     - _Requirements: 17.1, 17.2_
-  - [ ] 1.2 Install all production dependencies
+  - [x] 1.2 Install all production dependencies
     - Install: `react@19`, `react-dom@19`, `react-router-dom@7`, `@mui/material@6`, `@mui/icons-material@6`, `@emotion/react@11`, `@emotion/styled@11`, `@tanstack/react-query@5`, `axios@1`, `react-hook-form@7`, `zod@3`, `@hookform/resolvers@3`, `recharts@2`, `react-window@1`, `dompurify@3`, `@types/dompurify@3`, `date-fns@3`, `@sentry/react@8`, `@sentry/vite-plugin@2`
     - _Requirements: 17.1_
-  - [ ] 1.3 Install all dev dependencies
+  - [x] 1.3 Install all dev dependencies
     - Install: `vitest@2`, `@testing-library/react@16`, `@testing-library/user-event@14`, `@testing-library/jest-dom`, `msw@2`, `fast-check@3`, `@types/react-window`, `jsdom`
     - _Requirements: 16.1_
-  - [ ] 1.4 Create `frontend/src/config/env.ts` — validated env vars
+  - [x] 1.4 Create `frontend/src/config/env.ts` — validated env vars
     - Export typed constants: `API_BASE_URL`, `APP_ENV`, `SENTRY_DSN`
     - Throw at module load time if `VITE_API_BASE_URL` is missing
     - _Requirements: 17.3_
-  - [ ] 1.5 Create `frontend/.env.development` and `frontend/.env.production`
+  - [x] 1.5 Create `frontend/.env.development` and `frontend/.env.production`
     - `.env.development`: `VITE_API_BASE_URL=http://localhost:3000/api/v1`, `VITE_ENV=development`
     - `.env.production`: `VITE_API_BASE_URL=https://api.tensor.school/api/v1`, `VITE_ENV=production`
     - _Requirements: 17.12_
-  - [ ] 1.6 Configure `vite.config.ts` with production build settings
+  - [x] 1.6 Configure `vite.config.ts` with production build settings
     - Add `@vitejs/plugin-react`, `@sentry/vite-plugin`, path alias `@/`
     - Configure `manualChunks`: vendor, mui, query, charts
     - Set `chunkSizeWarningLimit: 250`, `sourcemap: true`
     - Fail build if `VITE_API_BASE_URL` missing
     - _Requirements: 17.1, 17.4, 17.5_
-  - [ ] 1.7 Configure `vitest.config.ts` and `src/test/setup.ts`
+  - [x] 1.7 Configure `vitest.config.ts` and `src/test/setup.ts`
     - Environment: jsdom, globals: true, setupFiles pointing to setup.ts
     - Coverage thresholds: 80% lines/branches/functions/statements
     - Exclude `src/types/**`, `src/**/*.d.ts`, `src/test/**`, `src/main.tsx`
     - Setup file: import `@testing-library/jest-dom`, MSW server lifecycle hooks, sessionStorage mock
     - _Requirements: 16.10, 16.12_
-  - [ ] 1.8 Create `frontend/src/types/api.ts` — all API interfaces
+  - [x] 1.8 Create `frontend/src/types/api.ts` — all API interfaces
     - Define: `LoginRequest`, `LoginResponse`, `DecodedToken`, `Student`, `CreateStudentRequest`, `StudentListParams`, `AttendanceRecord`, `AttendanceStatus`, `MarkAttendanceRequest`, `AttendanceStats`, `FeeStructure`, `FeePayment`, `StudentFeeStatus`, `Exam`, `ExamType`, `Mark`, `LetterGrade`, `ExamStatistics`, `TimetableEntry`, `DayOfWeek`, `PaginatedResponse<T>`, `ApiResponse<T>`, `ApiError` class
     - _Requirements: 18.7_
-  - [ ] 1.9 Create `frontend/src/types/domain.ts` — domain model types
+  - [x] 1.9 Create `frontend/src/types/domain.ts` — domain model types
     - Define: `NavItem`, `RouteHandle`, `PaginationState`, `SortingState`, `ColumnDef<T>`, `AuthStatus`, `ToastVariant`, `Toast`
     - _Requirements: 19.1_
 
-- [ ] 2. Design system — MUI v6 MD3 theme
-  - [ ] 2.1 Create `frontend/src/theme/tokens.ts` — MD3 color, spacing, elevation, motion tokens
+- [x] 2. Design system — MUI v6 MD3 theme
+  - [x] 2.1 Create `frontend/src/theme/tokens.ts` — MD3 color, spacing, elevation, motion tokens
     - Export `colorTokens` with full light and dark palettes (primary, secondary, tertiary, error, surface, background, outline tokens)
     - Export `spacingTokens` array: `[0, 4, 8, 12, 16, 24, 32, 48, 64]`
     - Export `elevationTokens` object with levels 0–5 as box-shadow strings
     - Export `motionTokens`: durationShort (100ms), durationMedium (250ms), durationLong (400ms), four easing curves
     - Export `breakpoints`: compact (0), medium (600), expanded (905)
     - _Requirements: 3.1, 3.5, 3.6, 3.7, 3.8_
-  - [ ] 2.2 Create `frontend/src/theme/typography.ts` — type scale
+  - [x] 2.2 Create `frontend/src/theme/typography.ts` — type scale
     - Define `typographyScale` with all seven levels: displayLarge, headlineMedium, titleLarge, titleMedium, bodyLarge, bodyMedium, labelLarge
     - _Requirements: 3.4_
-  - [ ] 2.3 Create `frontend/src/theme/components.ts` — MUI component overrides
+  - [x] 2.3 Create `frontend/src/theme/components.ts` — MUI component overrides
     - Override: Button (filled/outlined/text/elevated/tonal variants), TextField, Select, Checkbox, Card, Dialog, Snackbar, DataTable, Tabs
     - Apply MD3 rounded corners (borderRadius: 12), motion tokens to transitions
     - _Requirements: 3.12_
-  - [ ] 2.4 Create `frontend/src/theme/index.ts` — CssVarsProvider theme export
+  - [x] 2.4 Create `frontend/src/theme/index.ts` — CssVarsProvider theme export
     - Use `experimental_extendTheme` with `colorSchemes: { light, dark }` from tokens
     - Apply typography scale, spacing base 4px, shape borderRadius 12
     - Import component overrides
     - _Requirements: 3.1, 3.2_
-  - [ ] 2.5 Create `frontend/src/contexts/ThemeContext.tsx`
+  - [x] 2.5 Create `frontend/src/contexts/ThemeContext.tsx`
     - Interface: `{ mode: 'light' | 'dark' | 'system'; setMode; resolvedMode }`
     - Persist to `localStorage` key `tensor-theme-mode`
     - Listen to `window.matchMedia('(prefers-color-scheme: dark)')` for system mode
     - Pass `colorScheme` prop to `CssVarsProvider`
     - _Requirements: 3.2, 3.3_
-  - [ ] 2.6 Create `frontend/src/hooks/useTheme.ts`
+  - [x] 2.6 Create `frontend/src/hooks/useTheme.ts`
     - Consume `ThemeContext`, re-export `mode`, `setMode`, `resolvedMode`
     - _Requirements: 3.2_
-  - [ ]* 2.7 Write snapshot tests for Design System base components
+  - [x] 2.7 Write snapshot tests for Design System base components
     - Snapshot test each MUI override variant: Button (all 5 variants), TextField (outlined/filled), Card, Dialog, Snackbar
     - _Requirements: 16.9_
 
 - [ ] 3. Auth service and context
-  - [ ] 3.1 Create `frontend/src/services/authService.ts`
+  - [x] 3.1 Create `frontend/src/services/authService.ts`
     - Implement: `storeToken(token)` → sessionStorage only, `getToken()`, `clearSession()` → `sessionStorage.clear()`
     - Implement: `decodeToken(token)` → base64url decode payload, return `DecodedToken | null` for malformed input
     - Implement: `isNearExpiry(token)` → true if exp within 5 minutes, `isExpired(token)`
     - Never log token value; never store in localStorage
     - _Requirements: 1.1, 1.8, 1.9, 1.10, 1.13, 15.1, 15.12_
-  - [ ]* 3.2 Write property test for Token Decode Invariant (Property 2)
+  - [x] 3.2 Write property test for Token Decode Invariant (Property 2)
     - **Property 2: Token Decode Invariant**
     - **Validates: Requirements 1.9, 20.5**
     - For any valid JWT string, decoded `.exp` > `.iat`, and `userId`, `role`, `exp` fields are present
-  - [ ]* 3.3 Write property test for Malformed Token Rejection (Property 3)
+  - [-] 3.3 Write property test for Malformed Token Rejection (Property 3)
     - **Property 3: Malformed Token Rejection**
     - **Validates: Requirements 1.10**
     - For any non-JWT string, `decodeToken` returns `null`
-  - [ ]* 3.4 Write unit tests for authService
+  - [ ] 3.4 Write unit tests for authService
     - Test: token storage/retrieval, decode valid JWT, decode malformed returns null, isNearExpiry, isExpired, clearSession removes all keys
     - _Requirements: 16.2_
   - [ ] 3.5 Create `frontend/src/contexts/AuthContext.tsx`
@@ -128,27 +128,27 @@ Bottom-up implementation: project scaffolding → design system → services →
     - `formatCurrency(amount, locale?)` → `Intl.NumberFormat` with 2 decimal places
     - `parseCurrency(str)` → strip non-numeric chars, return float
     - _Requirements: 11.12, 18.5_
-  - [ ]* 4.4 Write property test for Bearer Token Injection (Property 1)
+  - [ ] 4.4 Write property test for Bearer Token Injection (Property 1)
     - **Property 1: Bearer Token Injection**
     - **Validates: Requirements 1.3, 18.2**
     - For any stored token, every outgoing request Authorization header equals `"Bearer " + token`
-  - [ ]* 4.5 Write property test for 401 Response Clears Session (Property 4)
+  - [ ] 4.5 Write property test for 401 Response Clears Session (Property 4)
     - **Property 4: 401 Response Clears Session**
     - **Validates: Requirements 1.5, 12.6**
     - For any endpoint returning 401, interceptor calls `clearSession()` and dispatches `auth:session-expired`
-  - [ ]* 4.6 Write property test for API Serializer Round-Trip (Property 13)
+  - [ ] 4.6 Write property test for API Serializer Round-Trip (Property 13)
     - **Property 13: API Serializer Round-Trip**
     - **Validates: Requirements 18.6, 20.4**
     - For any valid API response object, `deserialize(serialize(r))` deeply equals `r`
-  - [ ]* 4.7 Write property test for Date Round-Trip (Property 11)
+  - [ ] 4.7 Write property test for Date Round-Trip (Property 11)
     - **Property 11: Date Round-Trip**
     - **Validates: Requirements 11.12, 16.7, 20.2**
     - For any valid ISO date string, `formatDate(parseDate(formatDate(new Date(s))))` round-trips correctly
-  - [ ]* 4.8 Write property test for Currency Round-Trip (Property 12)
+  - [ ] 4.8 Write property test for Currency Round-Trip (Property 12)
     - **Property 12: Currency Round-Trip**
     - **Validates: Requirements 11.12, 16.8, 20.3**
     - For any non-negative number with ≤ 2 decimal places, `parseCurrency(formatCurrency(n)) === n`
-  - [ ]* 4.9 Write unit tests for apiClient
+  - [ ] 4.9 Write unit tests for apiClient
     - Test: Bearer header injection, 401 clears session, 403 throws ApiError, retry logic (3 attempts, exponential backoff), error message extraction, AbortController cancellation
     - _Requirements: 16.3_
 
@@ -156,14 +156,14 @@ Bottom-up implementation: project scaffolding → design system → services →
   - [ ] 5.1 Create `frontend/src/utils/gradeCalculator.ts`
     - `calculateGrade(marksObtained, maxMarks): LetterGrade` — A ≥ 90%, B ≥ 75%, C ≥ 60%, D ≥ 45%, F < 45%
     - _Requirements: 9.11_
-  - [ ]* 5.2 Write property test for Grade Calculator Monotonicity (Property 14)
+  - [ ] 5.2 Write property test for Grade Calculator Monotonicity (Property 14)
     - **Property 14: Grade Calculator Monotonicity**
     - **Validates: Requirements 9.11, 20.6**
     - For any `a > b` in `[0, maxMarks]`, `calculateGrade(a, maxMarks) >= calculateGrade(b, maxMarks)`
   - [ ] 5.3 Create `frontend/src/utils/attendanceCalculator.ts`
     - `calculatePercentage(records: AttendanceRecord[]): number` — present+late / total * 100, clamped to [0, 100]
     - _Requirements: 7.8_
-  - [ ]* 5.4 Write property test for Attendance Percentage Bounds (Property 15)
+  - [ ] 5.4 Write property test for Attendance Percentage Bounds (Property 15)
     - **Property 15: Attendance Percentage Bounds**
     - **Validates: Requirements 7.8, 20.7**
     - For any collection of attendance records, result is in `[0, 100]`
@@ -171,11 +171,11 @@ Bottom-up implementation: project scaffolding → design system → services →
     - `calculateOutstanding(structure: FeeStructure, payments: FeePayment[]): number` — totalFee - sum(payments), floor at 0
     - `calculateTotalFee(structure): number` — sum of all fee components
     - _Requirements: 8.3, 8.9_
-  - [ ]* 5.6 Write property test for Fee Outstanding Balance Invariant (Property 17)
+  - [ ] 5.6 Write property test for Fee Outstanding Balance Invariant (Property 17)
     - **Property 17: Fee Outstanding Balance Invariant**
     - **Validates: Requirements 20.9**
     - `outstandingBalance === totalFee - totalPaid` and `outstandingBalance >= 0`
-  - [ ]* 5.7 Write property test for Fee Total Equals Sum of Components (Property 18)
+  - [ ] 5.7 Write property test for Fee Total Equals Sum of Components (Property 18)
     - **Property 18: Fee Total Equals Sum of Components**
     - **Validates: Requirements 8.3**
     - `totalFee === tuitionFee + transportFee + activityFee + otherFee`
@@ -183,28 +183,28 @@ Bottom-up implementation: project scaffolding → design system → services →
     - `calculateTotalPages(total, pageSize): number` — `Math.ceil(total / pageSize)`
     - `getPageItems<T>(items, page, pageSize): T[]`
     - _Requirements: 6.5, 18.8_
-  - [ ]* 5.9 Write property test for Pagination Invariant (Property 16)
+  - [ ] 5.9 Write property test for Pagination Invariant (Property 16)
     - **Property 16: Pagination Invariant**
     - **Validates: Requirements 18.8, 20.8**
     - `totalPages === Math.ceil(total / pageSize)`, last page item count is `total % pageSize` or `pageSize`
   - [ ] 5.10 Create `frontend/src/utils/sanitize.ts`
     - `sanitize(dirty: string): string` — DOMPurify with `ALLOWED_TAGS: []`, `ALLOWED_ATTR: []`
     - _Requirements: 15.2, 15.3_
-  - [ ]* 5.11 Write property test for XSS Sanitization (Property 22)
+  - [ ] 5.11 Write property test for XSS Sanitization (Property 22)
     - **Property 22: XSS Sanitization**
     - **Validates: Requirements 15.2**
     - For any string, `sanitize(s)` contains no `<script>`, no `javascript:`, no `on*` attributes
   - [ ] 5.12 Create `frontend/src/utils/routeParamValidator.ts`
     - `validatePositiveInt(param: string | undefined): number | null` — returns null for non-positive-integer strings
     - _Requirements: 15.8_
-  - [ ]* 5.13 Write property test for Route Parameter Validation (Property 23)
+  - [ ] 5.13 Write property test for Route Parameter Validation (Property 23)
     - **Property 23: Route Parameter Validation**
     - **Validates: Requirements 15.8**
     - For any string not matching `/^[1-9]\d*$/`, `validatePositiveInt` returns `null`
   - [ ] 5.14 Create `frontend/src/utils/csvExport.ts`
     - `exportToCsv(filename, rows, headers)` — build CSV string, trigger browser download via Blob URL
     - _Requirements: 6.14, 8.10_
-  - [ ]* 5.15 Write unit tests for all utility functions
+  - [ ] 5.15 Write unit tests for all utility functions
     - Test gradeCalculator (all grade boundaries), attendanceCalculator (empty, all present, all absent), feeCalculator (zero payments, overpayment guard), paginationHelper (edge cases: 0 items, exact page), sanitize (script injection, event handlers), routeParamValidator (negative, zero, float, non-numeric, valid)
     - _Requirements: 16.1_
 
@@ -227,31 +227,31 @@ Bottom-up implementation: project scaffolding → design system → services →
   - [ ] 6.4 Create timetable schema in `frontend/src/schemas/timetableSchemas.ts`
     - `timetableEntrySchema`: subject (required), teacherId (positive), roomNumber (optional), startTime (`/^\d{2}:\d{2}$/`), endTime; `.refine` endTime > startTime
     - _Requirements: 10.3, 10.4, 11.1_
-  - [ ]* 6.5 Write property test for Validator Idempotence (Property 8)
+  - [ ] 6.5 Write property test for Validator Idempotence (Property 8)
     - **Property 8: Validator Idempotence**
     - **Validates: Requirements 20.1**
     - For any input `v`, `validate(validate(v))` produces the same result as `validate(v)`
-  - [ ]* 6.6 Write property test for Name Validator Whitespace Invariance (Property 9)
+  - [ ] 6.6 Write property test for Name Validator Whitespace Invariance (Property 9)
     - **Property 9: Name Validator Whitespace Invariance**
     - **Validates: Requirements 15.9, 20.10**
     - For any string where `s.trim().length` is 2–100, validator returns valid regardless of surrounding whitespace
-  - [ ]* 6.7 Write property test for Amount Validator (Property 10)
+  - [ ] 6.7 Write property test for Amount Validator (Property 10)
     - **Property 10: Amount Validator Rejects Non-Positive Values**
     - **Validates: Requirements 8.12, 16.6**
     - For any `n <= 0`, amount validator returns error; for any `n > 0`, returns valid
-  - [ ]* 6.8 Write property test for Exam Marks Bounds (Property 19)
+  - [ ] 6.8 Write property test for Exam Marks Bounds (Property 19)
     - **Property 19: Exam Marks Bounds**
     - **Validates: Requirements 9.6**
     - `marksObtained` in `[0, maxMarks]`; when `isAbsent === true`, marksObtained is 0 or empty
-  - [ ]* 6.9 Write property test for Passing Marks Constraint (Property 20)
+  - [ ] 6.9 Write property test for Passing Marks Constraint (Property 20)
     - **Property 20: Passing Marks Constraint**
     - **Validates: Requirements 9.3**
     - Exam schema rejects any config where `passingMarks > maxMarks`
-  - [ ]* 6.10 Write property test for Timetable Time Order (Property 21)
+  - [ ] 6.10 Write property test for Timetable Time Order (Property 21)
     - **Property 21: Timetable Time Order**
     - **Validates: Requirements 10.4**
     - Timetable schema rejects entries where `endTime <= startTime`
-  - [ ]* 6.11 Write unit tests for all Zod schemas
+  - [ ] 6.11 Write unit tests for all Zod schemas
     - Test each schema: valid input passes, each invalid field produces correct error message, `.refine` cross-field rules fire correctly
     - _Requirements: 16.1_
 
@@ -268,7 +268,7 @@ Bottom-up implementation: project scaffolding → design system → services →
   - [ ] 7.3 Create `frontend/src/hooks/useToast.ts`
     - Consume `ToastContext`, expose `showToast`, `dismissToast`
     - _Requirements: 12.1_
-  - [ ]* 7.4 Write property test for Toast Stack Limit (Property 24)
+  - [ ] 7.4 Write property test for Toast Stack Limit (Property 24)
     - **Property 24: Toast Stack Limit**
     - **Validates: Requirements 12.3**
     - For any sequence of show calls, at most 3 toasts visible simultaneously; extras are queued
@@ -341,11 +341,11 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Unauthenticated → `<Navigate to="/login" state={{ from: location }} />`
     - Wrong role → `<Navigate to="/403" />`
     - _Requirements: 2.1, 2.2, 2.8_
-  - [ ]* 10.4 Write property test for Unauthenticated Route Redirect (Property 5)
+  - [ ] 10.4 Write property test for Unauthenticated Route Redirect (Property 5)
     - **Property 5: Unauthenticated Route Redirect**
     - **Validates: Requirements 2.1**
     - For any protected route, navigating without token redirects to `/login` with `state.from` set
-  - [ ]* 10.5 Write property test for Role-Based Route Enforcement (Property 6)
+  - [ ] 10.5 Write property test for Role-Based Route Enforcement (Property 6)
     - **Property 6: Role-Based Route Enforcement**
     - **Validates: Requirements 2.2, 2.8**
     - For any admin-only route, teacher role is redirected to `/403`
@@ -353,7 +353,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Props: `allowedRoles`, `children`, `fallback?` (default null)
     - Read `useAuth().user.role`; render children if role in allowedRoles, else fallback
     - _Requirements: 2.3, 2.4, 2.5, 2.6, 2.7, 2.11_
-  - [ ]* 10.7 Write property test for Teacher Permission Gate (Property 7)
+  - [ ] 10.7 Write property test for Teacher Permission Gate (Property 7)
     - **Property 7: Teacher Permission Gate**
     - **Validates: Requirements 2.3, 2.4, 2.5, 2.6, 2.7, 2.11**
     - For any teacher-role user, PermissionGate wrapping admin-only controls renders null
@@ -364,7 +364,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Add breadcrumb handles to all routes
     - Include `<link rel="prefetch">` for dashboard assets in `index.html`
     - _Requirements: 2.1, 2.2, 4.5, 13.1, 13.9_
-  - [ ]* 10.9 Write integration tests for Route Guard scenarios
+  - [ ] 10.9 Write integration tests for Route Guard scenarios
     - Test: unauthenticated redirect preserves path, teacher blocked from admin routes, admin accesses all routes
     - _Requirements: 16.5_
 
@@ -433,7 +433,7 @@ Bottom-up implementation: project scaffolding → design system → services →
   - [ ] 13.2 Create `frontend/src/components/data-display/VirtualList.tsx`
     - Wrap `react-window` `FixedSizeList`; props: `items`, `itemHeight`, `renderItem`, `overscan?: 10`
     - _Requirements: 6.6, 13.5_
-  - [ ]* 13.3 Write property test for Virtual List Threshold (Property 25)
+  - [ ] 13.3 Write property test for Virtual List Threshold (Property 25)
     - **Property 25: Virtual List Threshold**
     - **Validates: Requirements 6.6, 13.5**
     - Lists > 100 items render VirtualList; lists ≤ 100 items render DataTable
@@ -513,7 +513,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - On error: display "Invalid email or password" (non-revealing)
     - Add `<link rel="prefetch" href="/assets/DashboardPage.js" as="script">` in `index.html`
     - _Requirements: 1.1, 1.2, 1.11, 1.12, 11.5_
-  - [ ]* 16.2 Write integration tests for login flow
+  - [ ] 16.2 Write integration tests for login flow
     - Test: login success → redirect, login failure → error message, submit disables button, session expired toast on 401
     - _Requirements: 16.4_
 
@@ -562,7 +562,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Admin: "Edit" button → navigate to edit page; "Delete" button → `ConfirmDialog` requiring admission number typed
     - Validate `id` param; show 404 if invalid
     - _Requirements: 6.11, 6.13, 15.8_
-  - [ ]* 18.5 Write integration tests for student flows
+  - [ ] 18.5 Write integration tests for student flows
     - Test: student list loads, search filters, create student success, create student 422 error mapping, delete confirmation
     - _Requirements: 16.4_
 
@@ -580,7 +580,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Render attendance statistics panel: total days, present, absent, late, excused, percentage
     - Date range filter with start/end date pickers
     - _Requirements: 7.7, 7.8, 7.9_
-  - [ ]* 19.3 Write integration tests for attendance flow
+  - [ ] 19.3 Write integration tests for attendance flow
     - Test: mark attendance success with optimistic update, rollback on error, future date disabled, pre-populate existing records
     - _Requirements: 16.4_
 
@@ -611,7 +611,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - "Export CSV" button using `csvExport` utility
     - Admin-only route (PermissionGate + ProtectedRoute)
     - _Requirements: 8.8, 8.10_
-  - [ ]* 20.7 Write integration tests for fee flows
+  - [ ] 20.7 Write integration tests for fee flows
     - Test: fee structure create, payment record success, student fee status display, pending fees export
     - _Requirements: 16.4_
 
@@ -637,7 +637,7 @@ Bottom-up implementation: project scaffolding → design system → services →
   - [ ] 21.5 Create `frontend/src/pages/exams/StudentResultsPage.tsx`
     - Validate `id` param; list all exams with marks, letter grade (from `calculateGrade`), pass/fail status
     - _Requirements: 9.10, 9.11_
-  - [ ]* 21.6 Write integration tests for exam flows
+  - [ ] 21.6 Write integration tests for exam flows
     - Test: create exam, marks entry success, class results display, student results with grade calculation
     - _Requirements: 16.4_
 
@@ -653,7 +653,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Validate `id` param; fetch via `useTeacherTimetable(teacherId)`
     - Teacher users default to their own timetable (filtered by `useAuth().user.userId`)
     - _Requirements: 10.8, 10.9_
-  - [ ]* 22.3 Write integration tests for timetable flows
+  - [ ] 22.3 Write integration tests for timetable flows
     - Test: create entry, edit entry, delete entry with confirmation, teacher default view
     - _Requirements: 16.4_
 

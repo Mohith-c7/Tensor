@@ -1,0 +1,134 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Design System — Button variants > renders contained button 1`] = `
+<button
+  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-qo0jxs-MuiButtonBase-root-MuiButton-root"
+  tabindex="0"
+  type="button"
+>
+  Click
+</button>
+`;
+
+exports[`Design System — Button variants > renders outlined button 1`] = `
+<button
+  class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary css-6ciwe5-MuiButtonBase-root-MuiButton-root"
+  tabindex="0"
+  type="button"
+>
+  Click
+</button>
+`;
+
+exports[`Design System — Button variants > renders text button 1`] = `
+<button
+  class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary css-v2cbaa-MuiButtonBase-root-MuiButton-root"
+  tabindex="0"
+  type="button"
+>
+  Click
+</button>
+`;
+
+exports[`Design System — Card > renders Card 1`] = `
+<div
+  class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-ocszmq-MuiPaper-root-MuiCard-root"
+  style="--Paper-shadow: var(--mui-shadows-1); --Paper-overlay: var(--mui-overlays-1);"
+>
+  <div
+    class="MuiCardContent-root css-1lt5qva-MuiCardContent-root"
+  >
+    Content
+  </div>
+</div>
+`;
+
+exports[`Design System — Dialog > renders open Dialog 1`] = `
+<div
+  aria-hidden="true"
+/>
+`;
+
+exports[`Design System — Snackbar > renders open Snackbar 1`] = `
+<div>
+  <div
+    class="MuiSnackbar-root MuiSnackbar-anchorOriginBottomLeft css-hu4vni-MuiSnackbar-root"
+    role="presentation"
+  >
+    <div
+      class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation6 MuiSnackbarContent-root css-1lmgr12-MuiPaper-root-MuiSnackbarContent-root"
+      direction="up"
+      role="alert"
+      style="--Paper-shadow: var(--mui-shadows-6); --Paper-overlay: var(--mui-overlays-6); opacity: 1; transform: scale(1, 1); transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
+    >
+      <div
+        class="MuiSnackbarContent-message css-ozrxnr-MuiSnackbarContent-message"
+      >
+        Hello
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Design System — TextField variants > renders filled TextField 1`] = `
+<div
+  class="MuiFormControl-root MuiTextField-root css-1xp5r68-MuiFormControl-root-MuiTextField-root"
+>
+  <label
+    class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-filled MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-filled css-1rq0pf7-MuiFormLabel-root-MuiInputLabel-root"
+    data-shrink="false"
+    for="_r_9_"
+    id="_r_9_-label"
+  >
+    Name
+  </label>
+  <div
+    class="MuiInputBase-root MuiFilledInput-root MuiFilledInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-1n4grc2-MuiInputBase-root-MuiFilledInput-root"
+  >
+    <input
+      aria-invalid="false"
+      class="MuiInputBase-input MuiFilledInput-input css-1qd5ydy-MuiInputBase-input-MuiFilledInput-input"
+      id="_r_9_"
+      type="text"
+    />
+  </div>
+</div>
+`;
+
+exports[`Design System — TextField variants > renders outlined TextField 1`] = `
+<div
+  class="MuiFormControl-root MuiTextField-root css-1xp5r68-MuiFormControl-root-MuiTextField-root"
+>
+  <label
+    class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-v89gbr-MuiFormLabel-root-MuiInputLabel-root"
+    data-shrink="false"
+    for="_r_7_"
+    id="_r_7_-label"
+  >
+    Name
+  </label>
+  <div
+    class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-y5ky11-MuiInputBase-root-MuiOutlinedInput-root"
+  >
+    <input
+      aria-invalid="false"
+      class="MuiInputBase-input MuiOutlinedInput-input css-1inq7it-MuiInputBase-input-MuiOutlinedInput-input"
+      id="_r_7_"
+      type="text"
+    />
+    <fieldset
+      aria-hidden="true"
+      class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+    >
+      <legend
+        class="css-1n64csd-MuiNotchedOutlined-root"
+      >
+        <span>
+          Name
+        </span>
+      </legend>
+    </fieldset>
+  </div>
+</div>
+`;
