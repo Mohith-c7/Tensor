@@ -200,3 +200,50 @@ describe('validatePositiveInt', () => {
     expect(validatePositiveInt('1000')).toBe(1000);
   });
 });
+
+// ── csvExport ─────────────────────────────────────────────────────────────
+import { exportToCsv } from '../../utils/csvExport';
+
+describe('exportToCsv', () => {
+  let mockLink: { href: string; download: string; click: ReturnType<typeof vi.fn> };
+
+  beforeEach(() => {
+    mockLink = { href: '', download: '', click: vi.fn() };
+    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as unknown as HTMLElement);
+    vi.spyOn(document.body, 'appendChild').mockImplementation(() => mockLink as unknown as Node);
+    vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockLink as unknown as Node);
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn().mockReturnValue('blob:mock'),
+      revokeObjectURL: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('creates a download link and clicks it', () => {
+    const rows = [{ name: 'Alice', score: 95 }];
+    const headers = [{ key: 'name', label: 'Name' }, { key: 'score', label: 'Score' }];
+    exportToCsv('results', rows, headers);
+    expect(URL.createObjectURL).toHaveBeenCalled();
+    expect(mockLink.click).toHaveBeenCalled();
+  });
+
+  it('appends .csv extension if missing', () => {
+    exportToCsv('report', [], [{ key: 'id', label: 'ID' }]);
+    expect(mockLink.download).toBe('report.csv');
+  });
+
+  it('does not double-append .csv extension', () => {
+    exportToCsv('report.csv', [], [{ key: 'id', label: 'ID' }]);
+    expect(mockLink.download).toBe('report.csv');
+  });
+
+  it('escapes values with commas in quotes', () => {
+    const rows = [{ name: 'Smith, John' }];
+    const headers = [{ key: 'name', label: 'Name' }];
+    expect(() => exportToCsv('test', rows, headers)).not.toThrow();
+  });
+});
