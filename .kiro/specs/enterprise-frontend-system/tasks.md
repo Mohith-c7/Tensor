@@ -567,56 +567,56 @@ Bottom-up implementation: project scaffolding → design system → services →
     - _Requirements: 16.4_
 
 - [ ] 19. Attendance module
-  - [-] 19.1 Create `frontend/src/pages/attendance/AttendancePage.tsx`
+  - [x] 19.1 Create `frontend/src/pages/attendance/AttendancePage.tsx`
     - Selectors: class, section, date (with "Today" badge when date is today)
     - On selection: fetch existing records via `useClassAttendance`, pre-populate `AttendanceGrid`
     - Disable submission and show message for future dates
     - On submit: call `useMarkAttendance()` (optimistic update), show success toast with record count
     - Error state: allow retry without losing class/section/date selection
     - _Requirements: 7.1, 7.2, 7.5, 7.6, 7.10, 7.11, 7.12_
-  - [ ] 19.2 Create `frontend/src/pages/attendance/AttendanceStudentPage.tsx`
+  - [x] 19.2 Create `frontend/src/pages/attendance/AttendanceStudentPage.tsx`
     - Validate `id` param; show 404 if invalid
     - Render `AttendanceCalendar` for monthly view
     - Render attendance statistics panel: total days, present, absent, late, excused, percentage
     - Date range filter with start/end date pickers
     - _Requirements: 7.7, 7.8, 7.9_
-  - [ ] 19.3 Write integration tests for attendance flow
+  - [x] 19.3 Write integration tests for attendance flow
     - Test: mark attendance success with optimistic update, rollback on error, future date disabled, pre-populate existing records
     - _Requirements: 16.4_
 
 - [ ] 20. Fees module
-  - [ ] 20.1 Create `frontend/src/pages/fees/FeeStructuresPage.tsx`
+  - [x] 20.1 Create `frontend/src/pages/fees/FeeStructuresPage.tsx`
     - List from `useFeeStructures()`; columns: class, academic year, tuition, transport, activity, other, total
     - Admin: "Add Fee Structure" button (via `PermissionGate`)
     - _Requirements: 8.1_
-  - [ ] 20.2 Create `frontend/src/pages/fees/FeeStructureNewPage.tsx`
+  - [x] 20.2 Create `frontend/src/pages/fees/FeeStructureNewPage.tsx`
     - Form with `feeStructureSchema`; real-time total_fee computed display as user types
     - On submit: call `useCreateFeeStructure()`, show success toast, refresh list
     - _Requirements: 8.2, 8.3, 8.4_
-  - [ ] 20.3 Create `frontend/src/pages/fees/PaymentsPage.tsx`
+  - [x] 20.3 Create `frontend/src/pages/fees/PaymentsPage.tsx`
     - Payments list from `useFees().payments`; columns: student, academic year, amount, date, method
     - Admin: "Record Payment" button
     - _Requirements: 8.5_
-  - [ ] 20.4 Create `frontend/src/pages/fees/PaymentNewPage.tsx`
+  - [x] 20.4 Create `frontend/src/pages/fees/PaymentNewPage.tsx`
     - Form with `paymentSchema`; student searchable dropdown; amount must not exceed outstanding balance
     - On submit: call `useRecordPayment()`, show success toast with receipt summary, update student fee status
     - _Requirements: 8.5, 8.6_
-  - [ ] 20.5 Create `frontend/src/pages/fees/StudentFeePage.tsx`
+  - [x] 20.5 Create `frontend/src/pages/fees/StudentFeePage.tsx`
     - Validate `id` param; show fee structure for student's class, total paid, outstanding balance, payment history table
     - Color indicator: green (fully paid), amber (partially paid), red (no payment)
     - Warning banner if no fee structure exists for student's class/year, with link to create
     - _Requirements: 8.7, 8.9, 8.11_
-  - [ ] 20.6 Create `frontend/src/pages/fees/PendingFeesPage.tsx`
+  - [x] 20.6 Create `frontend/src/pages/fees/PendingFeesPage.tsx`
     - Fetch from `usePendingFees()`; sortable by amount due and student name
     - "Export CSV" button using `csvExport` utility
     - Admin-only route (PermissionGate + ProtectedRoute)
     - _Requirements: 8.8, 8.10_
-  - [ ] 20.7 Write integration tests for fee flows
+  - [x] 20.7 Write integration tests for fee flows
     - Test: fee structure create, payment record success, student fee status display, pending fees export
     - _Requirements: 16.4_
 
 - [ ] 21. Exams module
-  - [ ] 21.1 Create `frontend/src/pages/exams/ExamsPage.tsx`
+  - [-] 21.1 Create `frontend/src/pages/exams/ExamsPage.tsx`
     - List from `useExamList(params)`; columns: name, exam type, class, subject, max marks, passing marks, exam date
     - Filter panel: class, exam type, date range
     - Admin: "Create Exam" button (PermissionGate)
