@@ -513,12 +513,12 @@ Bottom-up implementation: project scaffolding → design system → services →
     - On error: display "Invalid email or password" (non-revealing)
     - Add `<link rel="prefetch" href="/assets/DashboardPage.js" as="script">` in `index.html`
     - _Requirements: 1.1, 1.2, 1.11, 1.12, 11.5_
-  - [-] 16.2 Write integration tests for login flow
+  - [x] 16.2 Write integration tests for login flow
     - Test: login success → redirect, login failure → error message, submit disables button, session expired toast on 401
     - _Requirements: 16.4_
 
 - [ ] 17. Dashboard page
-  - [ ] 17.1 Create `frontend/src/pages/dashboard/DashboardPage.tsx`
+  - [x] 17.1 Create `frontend/src/pages/dashboard/DashboardPage.tsx`
     - Admin view: 5 KPI cards (Total Students, Total Teachers, Attendance Rate Today, Pending Fees Count, Upcoming Exams Count)
     - Teacher view: 4 KPI cards (Classes Assigned, Attendance Marked Today, Upcoming Exams, Recent Marks Entries)
     - Lazy-load `AttendanceTrendChart` and `FeeCollectionChart` (Admin only) wrapped in `<Suspense>`
@@ -530,7 +530,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 12.4_
 
 - [ ] 18. Students module
-  - [ ] 18.1 Create `frontend/src/pages/students/StudentsPage.tsx`
+  - [-] 18.1 Create `frontend/src/pages/students/StudentsPage.tsx`
     - Paginated list via `useStudentList`; columns: Admission No, Full Name, Class, Section, Gender, Status
     - Debounced search input (300ms) filtering by name or admission number
     - Filter panel: class, section, gender, active status
