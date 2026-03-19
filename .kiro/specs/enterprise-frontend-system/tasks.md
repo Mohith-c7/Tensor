@@ -530,7 +530,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 12.4_
 
 - [ ] 18. Students module
-  - [-] 18.1 Create `frontend/src/pages/students/StudentsPage.tsx`
+  - [x] 18.1 Create `frontend/src/pages/students/StudentsPage.tsx`
     - Paginated list via `useStudentList`; columns: Admission No, Full Name, Class, Section, Gender, Status
     - Debounced search input (300ms) filtering by name or admission number
     - Filter panel: class, section, gender, active status
@@ -541,7 +541,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Empty state with "No students match your filters" + "Clear Filters" button
     - Error state with "Retry" button
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.14, 6.15, 6.16_
-  - [ ] 18.2 Create `frontend/src/pages/students/StudentNewPage.tsx`
+  - [x] 18.2 Create `frontend/src/pages/students/StudentNewPage.tsx`
     - Multi-step form (4 steps) using `MultiStepForm` + `FormProvider`
     - Step 1: Personal Info (admissionNo, firstName, lastName, dateOfBirth, gender)
     - Step 2: Contact & Address (email, phone, address)
@@ -552,22 +552,22 @@ Bottom-up implementation: project scaffolding → design system → services →
     - On 422: map API errors to form fields via `setError`
     - `useUnsavedChanges` to warn on navigation with dirty form
     - _Requirements: 6.7, 6.8, 6.9, 6.10, 11.8_
-  - [ ] 18.3 Create `frontend/src/pages/students/StudentEditPage.tsx`
+  - [x] 18.3 Create `frontend/src/pages/students/StudentEditPage.tsx`
     - Pre-populate form with existing student data from `useStudent(id)`
     - Validate `id` param with `validatePositiveInt`; show 404 if invalid
     - Same validation as create; on submit call `useUpdateStudent()`
     - _Requirements: 6.12, 15.8_
-  - [ ] 18.4 Create `frontend/src/pages/students/StudentProfilePage.tsx`
+  - [x] 18.4 Create `frontend/src/pages/students/StudentProfilePage.tsx`
     - Show all student fields, attendance summary (present/absent/late counts), fee payment history, exam results
     - Admin: "Edit" button → navigate to edit page; "Delete" button → `ConfirmDialog` requiring admission number typed
     - Validate `id` param; show 404 if invalid
     - _Requirements: 6.11, 6.13, 15.8_
-  - [ ] 18.5 Write integration tests for student flows
+  - [x] 18.5 Write integration tests for student flows
     - Test: student list loads, search filters, create student success, create student 422 error mapping, delete confirmation
     - _Requirements: 16.4_
 
 - [ ] 19. Attendance module
-  - [ ] 19.1 Create `frontend/src/pages/attendance/AttendancePage.tsx`
+  - [-] 19.1 Create `frontend/src/pages/attendance/AttendancePage.tsx`
     - Selectors: class, section, date (with "Today" badge when date is today)
     - On selection: fetch existing records via `useClassAttendance`, pre-populate `AttendanceGrid`
     - Disable submission and show message for future dates
