@@ -309,128 +309,128 @@ Bottom-up implementation: project scaffolding → design system → services →
     - `useUpdateTimetableEntry()`: `useMutation` → `PUT /timetable/:id`, invalidate
     - `useDeleteTimetableEntry()`: `useMutation` → `DELETE /timetable/:id`, invalidate
     - _Requirements: 10.1, 10.5, 10.7, 10.8, 19.6_
-  - [-] 8.6 Create `frontend/src/hooks/useDashboard.ts`
+  - [x] 8.6 Create `frontend/src/hooks/useDashboard.ts`
     - `useDashboardKPIs()`: `useQuery` with `refetchInterval: 5 * 60 * 1000`, `refetchIntervalInBackground: false`
     - `useAttendanceTrend()`: 30-day daily attendance data
     - `useFeeCollection()`: monthly collection data for current academic year
     - `useRecentActivity()`: last 10 audit events
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.9, 13.7_
-  - [ ] 8.7 Create `frontend/src/hooks/useDebounce.ts`
+  - [x] 8.7 Create `frontend/src/hooks/useDebounce.ts`
     - Generic `useDebounce<T>(value: T, delay: number): T` hook using `useState` + `useEffect`
     - _Requirements: 6.2, 13.6_
-  - [ ] 8.8 Create `frontend/src/hooks/useUnsavedChanges.ts`
+  - [x] 8.8 Create `frontend/src/hooks/useUnsavedChanges.ts`
     - Accept `isDirty: boolean`; use React Router `useBlocker` to intercept navigation when dirty
     - Show confirmation dialog before allowing navigation
     - _Requirements: 4.9_
-  - [ ] 8.9 Create `frontend/src/hooks/useVirtualList.ts`
+  - [x] 8.9 Create `frontend/src/hooks/useVirtualList.ts`
     - `useVirtualList<T>(items: T[])`: return `{ shouldVirtualize: items.length > 100, items }`
     - _Requirements: 6.6, 13.5_
 
-- [ ] 9. Checkpoint — core services complete
+- [x] 9. Checkpoint — core services complete
   - Ensure all tests pass for services, utilities, schemas, and hooks. Ask the user if questions arise.
 
 - [ ] 10. Router setup
-  - [ ] 10.1 Create `frontend/src/router/routes.ts` — route path constants
+  - [x] 10.1 Create `frontend/src/router/routes.ts` — route path constants
     - Export all route path strings as typed constants: `ROUTES.LOGIN`, `ROUTES.DASHBOARD`, `ROUTES.STUDENTS`, etc.
     - _Requirements: 4.1_
-  - [ ] 10.2 Create `frontend/src/router/handles.ts` — breadcrumb handle definitions
+  - [x] 10.2 Create `frontend/src/router/handles.ts` — breadcrumb handle definitions
     - Export `RouteHandle` type; define breadcrumb functions for all routes
     - _Requirements: 4.5_
-  - [ ] 10.3 Create `frontend/src/components/guards/ProtectedRoute.tsx`
+  - [x] 10.3 Create `frontend/src/components/guards/ProtectedRoute.tsx`
     - Read `useAuth().status`; while `initializing` render `<PageSkeleton />`
     - Unauthenticated → `<Navigate to="/login" state={{ from: location }} />`
     - Wrong role → `<Navigate to="/403" />`
     - _Requirements: 2.1, 2.2, 2.8_
-  - [ ] 10.4 Write property test for Unauthenticated Route Redirect (Property 5)
+  - [x] 10.4 Write property test for Unauthenticated Route Redirect (Property 5)
     - **Property 5: Unauthenticated Route Redirect**
     - **Validates: Requirements 2.1**
     - For any protected route, navigating without token redirects to `/login` with `state.from` set
-  - [ ] 10.5 Write property test for Role-Based Route Enforcement (Property 6)
+  - [x] 10.5 Write property test for Role-Based Route Enforcement (Property 6)
     - **Property 6: Role-Based Route Enforcement**
     - **Validates: Requirements 2.2, 2.8**
     - For any admin-only route, teacher role is redirected to `/403`
-  - [ ] 10.6 Create `frontend/src/components/guards/PermissionGate.tsx`
+  - [x] 10.6 Create `frontend/src/components/guards/PermissionGate.tsx`
     - Props: `allowedRoles`, `children`, `fallback?` (default null)
     - Read `useAuth().user.role`; render children if role in allowedRoles, else fallback
     - _Requirements: 2.3, 2.4, 2.5, 2.6, 2.7, 2.11_
-  - [ ] 10.7 Write property test for Teacher Permission Gate (Property 7)
+  - [x] 10.7 Write property test for Teacher Permission Gate (Property 7)
     - **Property 7: Teacher Permission Gate**
     - **Validates: Requirements 2.3, 2.4, 2.5, 2.6, 2.7, 2.11**
     - For any teacher-role user, PermissionGate wrapping admin-only controls renders null
-  - [ ] 10.8 Create `frontend/src/router/index.tsx` — full route tree with lazy loading
+  - [x] 10.8 Create `frontend/src/router/index.tsx` — full route tree with lazy loading
     - Lazy-load all page components with `React.lazy`
     - Wrap all lazy routes in `<Suspense fallback={<PageSkeleton />}>`
     - Apply `ProtectedRoute` with `requiredRole="admin"` to all admin-only routes
     - Add breadcrumb handles to all routes
     - Include `<link rel="prefetch">` for dashboard assets in `index.html`
     - _Requirements: 2.1, 2.2, 4.5, 13.1, 13.9_
-  - [ ] 10.9 Write integration tests for Route Guard scenarios
+  - [x] 10.9 Write integration tests for Route Guard scenarios
     - Test: unauthenticated redirect preserves path, teacher blocked from admin routes, admin accesses all routes
     - _Requirements: 16.5_
 
 - [ ] 11. Feedback and shared components
-  - [ ] 11.1 Create `frontend/src/components/feedback/ErrorFallback.tsx`
+  - [x] 11.1 Create `frontend/src/components/feedback/ErrorFallback.tsx`
     - Props: `error: Error`, `resetErrorBoundary: () => void`
     - Render: `role="alert"`, "Something went wrong" message, "Reload Section" button
     - _Requirements: 12.4, 12.5_
-  - [ ] 11.2 Create `frontend/src/components/feedback/OfflineBanner.tsx`
+  - [x] 11.2 Create `frontend/src/components/feedback/OfflineBanner.tsx`
     - Listen to `window` `offline`/`online` events; render persistent `<Alert>` with `aria-live="polite"` when offline
     - Disable all form submissions while offline
     - _Requirements: 12.12_
-  - [ ] 11.3 Create `frontend/src/components/feedback/Toast.tsx` and `ToastContainer.tsx`
+  - [x] 11.3 Create `frontend/src/components/feedback/Toast.tsx` and `ToastContainer.tsx`
     - `Toast`: render MUI Snackbar with variant-based color (success=green, error=red, warning=amber, info=blue), close button, optional action button
     - `ToastContainer`: render up to 3 toasts stacked in bottom-right corner, consume `ToastContext`
     - _Requirements: 12.1, 12.2, 12.3_
-  - [ ] 11.4 Create `frontend/src/components/feedback/SkeletonLoader.tsx`
+  - [x] 11.4 Create `frontend/src/components/feedback/SkeletonLoader.tsx`
     - Variants: `kpi-card`, `table-row`, `chart`, `list-item`; `count?` prop for multiple
     - Use MUI `Skeleton` with `animation="wave"`
     - _Requirements: 5.7, 13.3_
-  - [ ] 11.5 Create `frontend/src/components/feedback/EmptyState.tsx`
+  - [x] 11.5 Create `frontend/src/components/feedback/EmptyState.tsx`
     - Props: `illustration?`, `message`, `action?: { label, onClick }`
     - _Requirements: 6.15, 12.11_
-  - [ ] 11.6 Create `frontend/src/components/common/ConfirmDialog.tsx`
+  - [x] 11.6 Create `frontend/src/components/common/ConfirmDialog.tsx`
     - Props: `open`, `title`, `message`, `confirmLabel?`, `onConfirm`, `onCancel`, `requireTyping?`
     - When `requireTyping` is set, disable confirm button until user types the exact string
     - Manage focus: on open move to first focusable element; on close return focus to trigger
     - _Requirements: 6.13, 14.2_
-  - [ ] 11.7 Create `frontend/src/components/common/StatusChip.tsx`
+  - [x] 11.7 Create `frontend/src/components/common/StatusChip.tsx`
     - Render MUI Chip with both color and icon (not color alone) for: active/inactive, attendance statuses, fee payment status
     - _Requirements: 7.13, 14.9_
-  - [ ] 11.8 Create `frontend/src/components/common/PageHeader.tsx`
+  - [x] 11.8 Create `frontend/src/components/common/PageHeader.tsx`
     - Props: `title`, `actions?: React.ReactNode`; render as `<header>` row with title + action buttons
     - _Requirements: 4.1_
-  - [ ] 11.9 Create `frontend/src/components/common/ExternalLink.tsx`
+  - [x] 11.9 Create `frontend/src/components/common/ExternalLink.tsx`
     - Render `<a>` with `rel="noopener noreferrer"` and `target="_blank"`
     - _Requirements: 15.10_
 
 - [ ] 12. Form components
-  - [ ] 12.1 Create `frontend/src/components/forms/FormErrorMessage.tsx`
+  - [x] 12.1 Create `frontend/src/components/forms/FormErrorMessage.tsx`
     - Render error message in error color token with error icon; set `id` for `aria-describedby` linking
     - _Requirements: 11.3, 14.6_
-  - [ ] 12.2 Create `frontend/src/components/forms/RHFTextField.tsx`
+  - [x] 12.2 Create `frontend/src/components/forms/RHFTextField.tsx`
     - Wrap MUI `TextField` with RHF `Controller`; pass `error`, `helperText` from `fieldState`; set `aria-describedby` on error
     - _Requirements: 11.1, 14.5, 14.6_
-  - [ ] 12.3 Create `frontend/src/components/forms/RHFSelect.tsx`
+  - [x] 12.3 Create `frontend/src/components/forms/RHFSelect.tsx`
     - Wrap MUI `Select` + `FormControl` with RHF `Controller`; handle error state
     - _Requirements: 11.1_
-  - [ ] 12.4 Create `frontend/src/components/forms/RHFDatePicker.tsx`
+  - [x] 12.4 Create `frontend/src/components/forms/RHFDatePicker.tsx`
     - Wrap MUI date `TextField` (type="date") with RHF `Controller`; validate date range (1900–2100)
     - _Requirements: 11.1, 11.10_
-  - [ ] 12.5 Create `frontend/src/components/forms/RHFCheckbox.tsx` and `RHFRadioGroup.tsx`
+  - [x] 12.5 Create `frontend/src/components/forms/RHFCheckbox.tsx` and `RHFRadioGroup.tsx`
     - Wrap MUI `Checkbox` / `RadioGroup` with RHF `Controller`
     - _Requirements: 11.1_
-  - [ ] 12.6 Create `frontend/src/components/forms/MultiStepForm.tsx`
+  - [x] 12.6 Create `frontend/src/components/forms/MultiStepForm.tsx`
     - Props: `steps: string[]`, `currentStep: number`, `children`
     - Render step indicator (MUI Stepper), step content, Back/Next/Submit navigation
     - _Requirements: 6.7_
 
 - [ ] 13. Data display components
-  - [ ] 13.1 Create `frontend/src/components/data-display/DataTable.tsx`
+  - [x] 13.1 Create `frontend/src/components/data-display/DataTable.tsx`
     - Generic `DataTable<T>` with `columns: ColumnDef<T>[]`, `data`, `loading?`, `onRowClick?`, `selectable?`, `onSelectionChange?`, `pagination?`, `onPaginationChange?`, `sorting?`, `onSortingChange?`
     - Render `<table>` semantic element; show `SkeletonLoader` rows when loading
     - Support checkbox column for bulk selection
     - _Requirements: 3.12, 6.1, 6.4, 14.4_
-  - [ ] 13.2 Create `frontend/src/components/data-display/VirtualList.tsx`
+  - [x] 13.2 Create `frontend/src/components/data-display/VirtualList.tsx`
     - Wrap `react-window` `FixedSizeList`; props: `items`, `itemHeight`, `renderItem`, `overscan?: 10`
     - _Requirements: 6.6, 13.5_
   - [ ] 13.3 Write property test for Virtual List Threshold (Property 25)
