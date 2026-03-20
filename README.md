@@ -1,317 +1,122 @@
-# 🏫 School Management System (ERP) – Core Module (MVP)
+# Tensor School ERP
 
-## 📌 Overview
+A full-stack enterprise school management system built with React 19 + TypeScript on the frontend and Node.js + Express + Supabase on the backend.
 
-The School Management System is a web-based ERP solution designed to digitize and automate daily school operations.
-This MVP (Minimum Viable Product) focuses on **core functionalities** required to manage students, attendance, fees, exams, and scheduling.
-
-The goal of this project is to build a **simple, scalable, and efficient system** that can later be expanded with advanced and AI-based features.
+Covers student management, attendance, fees, exams, timetable, and role-based access control — all in a monorepo structure.
 
 ---
 
-# 🎯 Objectives
+## Tech Stack
 
-* Digitize school administrative tasks
-* Reduce manual workload for staff
-* Maintain centralized and structured data
-* Provide real-time access to school information
-* Build a scalable foundation for future enhancements
+### Frontend
+- React 19 + TypeScript + Vite 8
+- MUI v6 (Material Design 3 theme)
+- TanStack Query v5 (server state)
+- React Router v7 (data router)
+- React Hook Form + Zod (forms & validation)
+- Recharts (dashboard analytics)
+- MSW v2 (API mocking in tests)
+- Vitest + Testing Library (183 tests)
 
----
-
-# 🧱 Core Features (MVP)
-
-## 1️⃣ Student Management
-
-### Description
-
-Handles complete student lifecycle from admission to record management.
-
-### Features
-
-* Add new student
-* Edit student details
-* Delete student record
-* Assign student to class and section
-* Store parent/guardian details
-* Unique admission number for each student
-* Optional document upload (future enhancement)
-
-### Data Fields
-
-* Student ID (Primary Key)
-* Admission Number (Unique)
-* Full Name
-* Date of Birth
-* Gender
-* Address
-* Contact Number
-* Parent Name
-* Parent Contact
-* Class ID
-* Section ID
-
-### Database Tables
-
-* `students`
-* `parents`
-* `classes`
-* `sections`
+### Backend
+- Node.js 18+ + Express 4
+- Supabase (PostgreSQL)
+- JWT authentication
+- Joi validation
+- Winston logging + daily-rotate-file
+- node-cache (in-memory caching)
+- Swagger / OpenAPI 3.0 docs
+- Jest + Supertest
 
 ---
 
-## 2️⃣ Attendance Management
+## Project Structure
 
-### Description
-
-Tracks daily attendance of students class-wise.
-
-### Features
-
-* Mark attendance (Present/Absent)
-* Date-wise attendance tracking
-* Class-wise attendance entry
-* Basic attendance reports
-
-### Data Fields
-
-* Attendance ID
-* Student ID (Foreign Key)
-* Date
-* Status (Present/Absent)
-
-### Database Table
-
-* `attendance`
+```
+tensor-school-erp/
+├── frontend/          # React + TypeScript SPA
+├── backend/           # Node.js + Express REST API
+├── README.md
+└── SYSTEM_ARCHITECTURE.md
+```
 
 ---
 
-## 3️⃣ Fees & Billing System
+## Quick Start
 
-### Description
+### Backend
 
-Manages fee structure, payments, and pending dues.
+```bash
+cd backend
+npm install
+cp .env.example .env   # fill in SUPABASE_URL, SUPABASE_SERVICE_KEY, JWT_SECRET
+npm run dev            # http://localhost:5000
+```
 
-### Features
+Apply the database schema in the Supabase SQL editor:
+- `backend/src/database/schema.sql`
+- `backend/src/database/seed.sql`
 
-* Define fee structure per class
-* Record fee payments
-* Track pending dues
-* Generate payment receipts (PDF – future enhancement)
+Default admin: `admin@tensorschool.com` / `password`
 
-### Data Fields
+API docs: `http://localhost:5000/api-docs`
 
-* Fee ID
-* Class ID
-* Total Fee Amount
-* Payment ID
-* Student ID
-* Amount Paid
-* Payment Date
-* Payment Status (Paid/Pending)
+### Frontend
 
-### Database Tables
-
-* `fees`
-* `payments`
-
----
-
-## 4️⃣ Exams & Results Management
-
-### Description
-
-Manages exams, marks entry, and result generation.
-
-### Features
-
-* Create exams
-* Enter subject-wise marks
-* Calculate total marks and grades
-* View student results
-
-### Data Fields
-
-* Exam ID
-* Exam Name
-* Subject
-* Student ID
-* Marks Obtained
-* Total Marks
-* Grade
-
-### Database Tables
-
-* `exams`
-* `marks`
+```bash
+cd frontend
+npm install
+cp .env.example .env   # set VITE_API_URL=http://localhost:5000/api/v1
+npm run dev            # http://localhost:5173
+```
 
 ---
 
-## 5️⃣ Timetable Management
+## Features
 
-### Description
-
-Handles scheduling of classes and teachers.
-
-### Features
-
-* Create weekly timetable
-* Assign subjects and teachers
-* Class-wise timetable view
-* Conflict handling (future enhancement)
-
-### Data Fields
-
-* Timetable ID
-* Class ID
-* Section ID
-* Subject
-* Teacher ID
-* Day of Week
-* Time Slot
-
-### Database Table
-
-* `timetable`
+| Module | Description |
+|---|---|
+| Authentication | JWT login, token verification, sessionStorage |
+| RBAC | Admin and Teacher roles, ProtectedRoute, PermissionGate |
+| Students | Full CRUD, class/section assignment, parent details |
+| Attendance | Bulk mark, date/class filters, per-student stats |
+| Fees | Fee structures, payment recording, pending dues report |
+| Exams | Exam creation, bulk marks entry, results with grade stats |
+| Timetable | Weekly schedule, class and teacher views |
+| Dashboard | Analytics charts, summary cards, recent activity |
 
 ---
 
-## 6️⃣ User Authentication & Role Management
+## Testing
 
-### Description
+```bash
+# Frontend (183 tests)
+cd frontend
+npx vitest --run
 
-Provides secure login and role-based access control.
-
-### Roles
-
-* Admin
-* Teacher
-
-### Features
-
-* User registration (Admin-controlled)
-* Login / Logout
-* Role-based access permissions
-* Secure password storage (hashed)
-
-### Data Fields
-
-* User ID
-* Email
-* Password (hashed)
-* Role
-
-### Database Table
-
-* `users`
+# Backend
+cd backend
+npm test
+npm run test:coverage   # 80% threshold
+```
 
 ---
 
-# 🔄 System Workflow
+## Deployment
 
-## Admin
+| Layer | Platform |
+|---|---|
+| Frontend | Netlify / Vercel |
+| Backend | Render / Railway (or Docker) |
+| Database | Supabase (managed PostgreSQL) |
 
-* Manage students and classes
-* Configure fees
-* Create exams
-* View reports
-
-## Teacher
-
-* Mark attendance
-* Enter student marks
-* View timetable
+Docker support is included for the backend — see `backend/docker-compose.yml`.
 
 ---
 
-# 🗄️ Database Schema Overview
+## Documentation
 
-### Tables List
-
-* `users`
-* `students`
-* `parents`
-* `classes`
-* `sections`
-* `attendance`
-* `fees`
-* `payments`
-* `exams`
-* `marks`
-* `timetable`
-
----
-
-# 🛠️ Technology Stack
-
-## Frontend
-
-* HTML5
-* CSS3
-* JavaScript (or React for scalability)
-
-## Backend
-
-* Node.js with Express.js
-
-## Database
-
-* MySQL / PostgreSQL
-
-## Optional Tools
-
-* Firebase Authentication (optional)
-* Razorpay (for future online payments)
-
----
-
-# 📅 Development Plan (30 Days)
-
-## Week 1
-
-* Setup project structure
-* Implement authentication
-* Build student management module
-
-## Week 2
-
-* Implement attendance module
-
-## Week 3
-
-* Build fees & billing system
-
-## Week 4
-
-* Implement exams & timetable
-* Basic UI improvements
-* Testing and debugging
-
----
-
-# 🚀 Future Enhancements (Not in MVP)
-
-* Parent & student mobile app
-* SMS/WhatsApp notifications
-* Online fee payments
-* AI-based analytics
-* Automated reminders
-* Transport & hostel management
-* Report generation (PDF)
-
----
-
-# ⚠️ Notes
-
-* This is an MVP version focused on core functionality
-* System is designed to be modular and scalable
-* Additional features will be added in future versions
-
----
-
-# 📌 Conclusion
-
-This project lays the foundation for a full-scale School ERP system.
-By focusing on core modules first, it ensures a working product that can be tested, improved, and expanded into a complete SaaS solution.
-
----
+- [Backend API & Setup](backend/README.md)
+- [Backend Environment Setup](backend/SETUP.md)
+- [Frontend Guide](frontend/README.md)
+- [System Architecture](SYSTEM_ARCHITECTURE.md)

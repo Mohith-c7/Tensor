@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/guards/ProtectedRoute';
+import { AuthLayout } from '../components/layout/AuthLayout';
 import { ROUTES } from './routes';
 import { handles } from './handles';
 
@@ -46,6 +47,10 @@ const withSuspense = (element: React.ReactNode) => (
 );
 
 export const router = createBrowserRouter([
+  {
+    // Root layout: provides AuthProvider to all routes
+    element: <AuthLayout />,
+    children: [
   {
     path: ROUTES.LOGIN,
     element: withSuspense(<LoginPage />),
@@ -200,4 +205,6 @@ export const router = createBrowserRouter([
   { path: ROUTES.NOT_FOUND, element: withSuspense(<NotFoundPage />) },
   { path: ROUTES.FORBIDDEN, element: withSuspense(<ForbiddenPage />) },
   { path: '*', element: <Navigate to={ROUTES.NOT_FOUND} replace /> },
+    ],
+  },
 ]);

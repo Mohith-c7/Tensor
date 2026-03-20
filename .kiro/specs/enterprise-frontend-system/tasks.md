@@ -152,7 +152,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: Bearer header injection, 401 clears session, 403 throws ApiError, retry logic (3 attempts, exponential backoff), error message extraction, AbortController cancellation
     - _Requirements: 16.3_
 
-- [ ] 5. Utility functions
+- [x] 5. Utility functions
   - [x] 5.1 Create `frontend/src/utils/gradeCalculator.ts`
     - `calculateGrade(marksObtained, maxMarks): LetterGrade` — A ≥ 90%, B ≥ 75%, C ≥ 60%, D ≥ 45%, F < 45%
     - _Requirements: 9.11_
@@ -208,7 +208,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test gradeCalculator (all grade boundaries), attendanceCalculator (empty, all present, all absent), feeCalculator (zero payments, overpayment guard), paginationHelper (edge cases: 0 items, exact page), sanitize (script injection, event handlers), routeParamValidator (negative, zero, float, non-numeric, valid)
     - _Requirements: 16.1_
 
-- [ ] 6. Zod validation schemas
+- [x] 6. Zod validation schemas
   - [x] 6.1 Create student form schemas in `frontend/src/schemas/studentSchemas.ts`
     - `studentPersonalSchema`: admissionNo (required, `/^[A-Z0-9-]+$/`), firstName/lastName (2–100 chars, trimmed), dateOfBirth (age 3–25), gender enum
     - `studentContactSchema`: email (optional), phone (optional), address (optional)
@@ -255,7 +255,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test each schema: valid input passes, each invalid field produces correct error message, `.refine` cross-field rules fire correctly
     - _Requirements: 16.1_
 
-- [ ] 7. State management — TanStack Query setup
+- [x] 7. State management — TanStack Query setup
   - [x] 7.1 Create `frontend/src/config/queryClient.ts`
     - Configure `QueryClient`: staleTime 5min, gcTime 10min, retry logic (no retry for 4xx, max 3 for 5xx), retryDelay exponential (1s/2s/4s), `refetchOnWindowFocus: true`, `refetchOnReconnect: true`, mutations `retry: false`
     - Export `queryKeys` factory for all domains: students, attendance, fees, exams, timetable, dashboard
@@ -273,7 +273,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - **Validates: Requirements 12.3**
     - For any sequence of show calls, at most 3 toasts visible simultaneously; extras are queued
 
-- [ ] 8. Custom domain hooks
+- [x] 8. Custom domain hooks
   - [x] 8.1 Create `frontend/src/hooks/useStudents.ts`
     - `useStudentList(params)`: `useQuery` with `queryKeys.students.list(params)`, `fetchPaginated`, `keepPreviousData`
     - `useStudent(id)`: `useQuery` with `queryKeys.students.detail(id)`, enabled when `id > 0`
@@ -329,7 +329,7 @@ Bottom-up implementation: project scaffolding → design system → services →
 - [x] 9. Checkpoint — core services complete
   - Ensure all tests pass for services, utilities, schemas, and hooks. Ask the user if questions arise.
 
-- [ ] 10. Router setup
+- [x] 10. Router setup
   - [x] 10.1 Create `frontend/src/router/routes.ts` — route path constants
     - Export all route path strings as typed constants: `ROUTES.LOGIN`, `ROUTES.DASHBOARD`, `ROUTES.STUDENTS`, etc.
     - _Requirements: 4.1_
@@ -368,7 +368,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: unauthenticated redirect preserves path, teacher blocked from admin routes, admin accesses all routes
     - _Requirements: 16.5_
 
-- [ ] 11. Feedback and shared components
+- [x] 11. Feedback and shared components
   - [x] 11.1 Create `frontend/src/components/feedback/ErrorFallback.tsx`
     - Props: `error: Error`, `resetErrorBoundary: () => void`
     - Render: `role="alert"`, "Something went wrong" message, "Reload Section" button
@@ -403,7 +403,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Render `<a>` with `rel="noopener noreferrer"` and `target="_blank"`
     - _Requirements: 15.10_
 
-- [ ] 12. Form components
+- [x] 12. Form components
   - [x] 12.1 Create `frontend/src/components/forms/FormErrorMessage.tsx`
     - Render error message in error color token with error icon; set `id` for `aria-describedby` linking
     - _Requirements: 11.3, 14.6_
@@ -424,7 +424,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Render step indicator (MUI Stepper), step content, Back/Next/Submit navigation
     - _Requirements: 6.7_
 
-- [ ] 13. Data display components
+- [x] 13. Data display components
   - [x] 13.1 Create `frontend/src/components/data-display/DataTable.tsx`
     - Generic `DataTable<T>` with `columns: ColumnDef<T>[]`, `data`, `loading?`, `onRowClick?`, `selectable?`, `onSelectionChange?`, `pagination?`, `onPaginationChange?`, `sorting?`, `onSortingChange?`
     - Render `<table>` semantic element; show `SkeletonLoader` rows when loading
@@ -504,7 +504,7 @@ Bottom-up implementation: project scaffolding → design system → services →
 - [x] 15. Checkpoint — all components wired
   - Ensure all tests pass for components, layout, and routing. Ask the user if questions arise.
 
-- [ ] 16. Login page
+- [x] 16. Login page
   - [x] 16.1 Create `frontend/src/pages/auth/LoginPage.tsx`
     - Form with email field (`autocomplete="email"`) and password field (`autocomplete="current-password"`)
     - Use `RHFTextField` + Zod schema for validation
@@ -517,7 +517,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: login success → redirect, login failure → error message, submit disables button, session expired toast on 401
     - _Requirements: 16.4_
 
-- [ ] 17. Dashboard page
+- [x] 17. Dashboard page
   - [x] 17.1 Create `frontend/src/pages/dashboard/DashboardPage.tsx`
     - Admin view: 5 KPI cards (Total Students, Total Teachers, Attendance Rate Today, Pending Fees Count, Upcoming Exams Count)
     - Teacher view: 4 KPI cards (Classes Assigned, Attendance Marked Today, Upcoming Exams, Recent Marks Entries)
@@ -529,7 +529,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - KPI card click navigates to corresponding module
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 12.4_
 
-- [ ] 18. Students module
+- [x] 18. Students module
   - [x] 18.1 Create `frontend/src/pages/students/StudentsPage.tsx`
     - Paginated list via `useStudentList`; columns: Admission No, Full Name, Class, Section, Gender, Status
     - Debounced search input (300ms) filtering by name or admission number
@@ -566,7 +566,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: student list loads, search filters, create student success, create student 422 error mapping, delete confirmation
     - _Requirements: 16.4_
 
-- [ ] 19. Attendance module
+- [x] 19. Attendance module
   - [x] 19.1 Create `frontend/src/pages/attendance/AttendancePage.tsx`
     - Selectors: class, section, date (with "Today" badge when date is today)
     - On selection: fetch existing records via `useClassAttendance`, pre-populate `AttendanceGrid`
@@ -584,7 +584,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: mark attendance success with optimistic update, rollback on error, future date disabled, pre-populate existing records
     - _Requirements: 16.4_
 
-- [ ] 20. Fees module
+- [x] 20. Fees module
   - [x] 20.1 Create `frontend/src/pages/fees/FeeStructuresPage.tsx`
     - List from `useFeeStructures()`; columns: class, academic year, tuition, transport, activity, other, total
     - Admin: "Add Fee Structure" button (via `PermissionGate`)
@@ -615,7 +615,7 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: fee structure create, payment record success, student fee status display, pending fees export
     - _Requirements: 16.4_
 
-- [ ] 21. Exams module
+- [x] 21. Exams module
   - [x] 21.1 Create `frontend/src/pages/exams/ExamsPage.tsx`
     - List from `useExamList(params)`; columns: name, exam type, class, subject, max marks, passing marks, exam date
     - Filter panel: class, exam type, date range
@@ -641,63 +641,63 @@ Bottom-up implementation: project scaffolding → design system → services →
     - Test: create exam, marks entry success, class results display, student results with grade calculation
     - _Requirements: 16.4_
 
-- [ ] 22. Timetable module
-  - [-] 22.1 Create `frontend/src/pages/timetable/TimetablePage.tsx`
+- [x] 22. Timetable module
+  - [x] 22.1 Create `frontend/src/pages/timetable/TimetablePage.tsx`
     - Class/section selector; render `TimetableGrid` from `useClassTimetable`
     - Admin: empty cell click → create dialog; existing cell click → edit dialog (PermissionGate)
     - Create/edit dialog uses `timetableEntrySchema`; conflict warning if time slot overlaps
     - Delete: confirmation prompt → `useDeleteTimetableEntry()`
     - Grid updates without full page reload after create/edit/delete
     - _Requirements: 10.1, 10.2, 10.3, 10.5, 10.6, 10.7, 10.11_
-  - [ ] 22.2 Create `frontend/src/pages/timetable/TeacherTimetablePage.tsx`
+  - [x] 22.2 Create `frontend/src/pages/timetable/TeacherTimetablePage.tsx`
     - Validate `id` param; fetch via `useTeacherTimetable(teacherId)`
     - Teacher users default to their own timetable (filtered by `useAuth().user.userId`)
     - _Requirements: 10.8, 10.9_
-  - [ ] 22.3 Write integration tests for timetable flows
+  - [x] 22.3 Write integration tests for timetable flows
     - Test: create entry, edit entry, delete entry with confirmation, teacher default view
     - _Requirements: 16.4_
 
-- [ ] 23. Error pages
-  - [ ] 23.1 Create `frontend/src/pages/errors/NotFoundPage.tsx`
+- [x] 23. Error pages
+  - [x] 23.1 Create `frontend/src/pages/errors/NotFoundPage.tsx`
     - "404 Not Found" message with "Go Back" button (`useNavigate(-1)`)
     - _Requirements: 12.8_
-  - [ ] 23.2 Create `frontend/src/pages/errors/ForbiddenPage.tsx`
+  - [x] 23.2 Create `frontend/src/pages/errors/ForbiddenPage.tsx`
     - "403 Forbidden" message with "Return to Dashboard" button
     - _Requirements: 2.2_
 
-- [ ] 24. Checkpoint — all pages complete
+- [x] 24. Checkpoint — all pages complete
   - Ensure all tests pass for all page components and module flows. Ask the user if questions arise.
 
-- [ ] 25. MSW mock setup and integration tests
-  - [ ] 25.1 Create `frontend/src/test/mocks/handlers.ts` — MSW request handlers
+- [x] 25. MSW mock setup and integration tests
+  - [x] 25.1 Create `frontend/src/test/mocks/handlers.ts` — MSW request handlers
     - Define handlers for all API endpoints: `POST /auth/login`, `POST /auth/verify`, `GET /students`, `POST /students`, `GET /students/:id`, `PUT /students/:id`, `DELETE /students/:id`, `GET /attendance/class`, `POST /attendance`, `GET /fees/structures`, `POST /fees/structures`, `GET /fees/payments`, `POST /fees/payments`, `GET /fees/student/:id`, `GET /fees/pending`, `GET /exams`, `POST /exams`, `GET /exams/:id/marks`, `POST /exams/:id/marks`, `PUT /marks/:id`, `GET /exams/:id/results`, `GET /exams/student/:id`, `GET /timetable`, `POST /timetable`, `PUT /timetable/:id`, `DELETE /timetable/:id`
     - _Requirements: 16.4_
-  - [ ] 25.2 Create `frontend/src/test/mocks/server.ts` — MSW server setup
+  - [x] 25.2 Create `frontend/src/test/mocks/server.ts` — MSW server setup
     - `setupServer(...handlers)` for Node environment (Vitest)
     - _Requirements: 16.4_
-  - [ ] 25.3 Create `frontend/src/test/mocks/fixtures.ts` — test data fixtures
+  - [x] 25.3 Create `frontend/src/test/mocks/fixtures.ts` — test data fixtures
     - Export typed fixture objects for: admin user token, teacher user token, student list, attendance records, fee structures, payments, exams, marks, timetable entries
     - _Requirements: 16.4_
-  - [ ] 25.4 Write integration tests for auth flow
+  - [x] 25.4 Write integration tests for auth flow
     - Test: login success → token stored → redirect, login failure → error message, verify on init → authenticated, verify 401 → unauthenticated redirect, logout → session cleared
     - _Requirements: 16.4_
-  - [ ] 25.5 Write integration tests for RBAC flows
+  - [x] 25.5 Write integration tests for RBAC flows
     - Test: unauthenticated → redirect to login with `state.from`, teacher → admin route → 403 page, admin → all routes accessible, PermissionGate hides admin controls for teacher
     - _Requirements: 16.5_
 
-- [ ] 26. Build configuration and deployment files
-  - [ ] 26.1 Create `frontend/netlify.toml`
+- [x] 26. Build configuration and deployment files
+  - [x] 26.1 Create `frontend/netlify.toml`
     - Build command, publish dir, SPA redirect `/* → /index.html`, cache headers for assets (1 year) and index.html (no-cache), CSP header
     - _Requirements: 17.8, 17.9, 17.11_
-  - [ ] 26.2 Create `frontend/vercel.json`
+  - [x] 26.2 Create `frontend/vercel.json`
     - SPA rewrite rule, cache headers for assets and index.html
     - _Requirements: 17.11_
-  - [ ] 26.3 Add CSP meta tag to `frontend/index.html`
+  - [x] 26.3 Add CSP meta tag to `frontend/index.html`
     - `default-src 'self'`, `script-src 'self'`, `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: https:`, `connect-src 'self' https://api.tensor.school https://*.sentry.io`, `font-src 'self'`, `frame-ancestors 'none'`
     - Add `<link rel="prefetch" href="/assets/DashboardPage.js" as="script">`
     - _Requirements: 15.5, 17.8, 13.9_
 
-- [ ] 27. Final checkpoint — full test suite and quality audit
+- [x] 27. Final checkpoint — full test suite and quality audit
   - Run `vitest --run --coverage` and verify ≥ 80% line/branch/function coverage across all source files
   - Verify all 25 property-based tests pass with fast-check
   - Verify all integration tests pass with MSW
