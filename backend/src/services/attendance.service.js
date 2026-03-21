@@ -101,7 +101,8 @@ class AttendanceService {
   }
 
   /**
-   * Get attendance for a class/section — joins through students table
+   * Get attendance for a class/section — joins through students table.
+   * Always returns all active students; attendance status defaults to 'present' if not yet marked.
    */
   async getClassAttendance(classId, sectionId, { date, startDate, endDate } = {}) {
     const { data: students, error: sErr } = await supabase
@@ -109,19 +110,18 @@ class AttendanceService {
       .select('id, admission_no, first_name, last_name')
       .eq('class_id', classId)
       .eq('section_id', sectionId)
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .order('first_name');
 
     if (sErr) throw new DatabaseError('Failed to fetch class students');
     if (!students || students.length === 0) return [];
 
     const studentIds = students.map(s => s.id);
-    const studentMap = Object.fromEntries(students.map(s => [s.id, s]));
 
     let query = supabase
       .from('attendance')
       .select('id, student_id, date, status, remarks, marked_by, created_at')
-      .in('student_id', studentIds)
-      .order('date', { ascending: false });
+      .in('student_id', studentIds);
 
     if (date) query = query.eq('date', date);
     else {
@@ -129,19 +129,28 @@ class AttendanceService {
       if (endDate) query = query.lte('date', endDate);
     }
 
-    const { data, error } = await query;
+    const { data: records, error } = await query;
     if (error) throw new DatabaseError('Failed to fetch class attendance');
 
-    return (data || []).map(r => {
-      const s = studentMap[r.student_id];
+    // Build a map of existing records keyed by student_id
+    const recordMap = {};
+    for (const r of (records || [])) {
+      recordMap[r.student_id] = r;
+    }
+
+    // Return one row per student — use existing record if present, else default to 'present'
+    return students.map(s => {
+      const r = recordMap[s.id];
       return {
-        id: r.id, date: r.date, status: r.status, remarks: r.remarks,
-        markedBy: r.marked_by, createdAt: r.created_at,
-        student: s ? {
-          id: s.id, admissionNo: s.admission_no,
-          firstName: s.first_name, lastName: s.last_name,
-          fullName: `${s.first_name} ${s.last_name}`
-        } : null
+        id: r?.id ?? null,
+        studentId: s.id,
+        studentName: `${s.first_name} ${s.last_name}`,
+        admissionNo: s.admission_no,
+        date: r?.date ?? (date || null),
+        status: r?.status ?? 'present',
+        remarks: r?.remarks ?? null,
+        markedBy: r?.marked_by ?? null,
+        createdAt: r?.created_at ?? null,
       };
     });
   }

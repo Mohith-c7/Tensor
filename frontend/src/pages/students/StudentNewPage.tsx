@@ -39,7 +39,7 @@ export default function StudentNewPage() {
     defaultValues: {
       admissionNo: '', firstName: '', lastName: '', dateOfBirth: '',
       gender: undefined, email: '', phone: '', address: '',
-      classId: 0, sectionId: 0, admissionDate: '',
+      classId: undefined, sectionId: undefined, admissionDate: '',
       parentName: '', parentPhone: '', parentEmail: '',
     },
     mode: 'onTouched',
@@ -49,7 +49,7 @@ export default function StudentNewPage() {
   const selectedClassId = watch('classId');
 
   const { data: classes = [] } = useClasses();
-  const { data: sections = [] } = useSections(Number(selectedClassId) || 0);
+  const { data: sections = [] } = useSections(selectedClassId > 0 ? selectedClassId : 0);
 
   useUnsavedChanges(isDirty && !isSubmitting);
 
@@ -130,7 +130,7 @@ export default function StudentNewPage() {
                   label="Class"
                   fullWidth
                   required
-                  onChange={() => setValue('sectionId', 0)}
+                  onChange={() => setValue('sectionId', undefined as unknown as number)}
                 >
                   {classes.map((c) => (
                     <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>

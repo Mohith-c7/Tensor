@@ -55,9 +55,9 @@ export default function AttendancePage() {
 
   const markAttendance = useMarkAttendance();
 
-  // Pre-populate rows from existing records
+  // Populate rows whenever the query result changes
   useEffect(() => {
-    if (existing && existing.length > 0) {
+    if (existing) {
       setRows(
         existing.map((r) => ({
           studentId: r.studentId,
@@ -105,7 +105,7 @@ export default function AttendancePage() {
           <Select
             label="Class"
             value={classId}
-            onChange={(e) => { setClassId(e.target.value); setSectionId(''); }}
+            onChange={(e) => { setClassId(e.target.value); setSectionId(''); setRows([]); }}
           >
             {classes.map((c) => (
               <MenuItem key={c.id} value={String(c.id)}>{c.name}</MenuItem>
@@ -118,7 +118,7 @@ export default function AttendancePage() {
           <Select
             label="Section"
             value={sectionId}
-            onChange={(e) => setSectionId(e.target.value)}
+            onChange={(e) => { setSectionId(e.target.value); setRows([]); }}
           >
             {sections.map((s) => (
               <MenuItem key={s.id} value={String(s.id)}>Section {s.name}</MenuItem>

@@ -18,7 +18,7 @@ type RHFSelectProps = SelectProps & {
  * React Hook Form controlled MUI Select.
  * Requirements: 11.1
  */
-export function RHFSelect({ name, label, helperText, children, ...props }: RHFSelectProps) {
+export function RHFSelect({ name, label, helperText, children, onChange: externalOnChange, ...props }: RHFSelectProps) {
   const { control } = useFormContext();
   const labelId = `${name}-label`;
 
@@ -29,7 +29,20 @@ export function RHFSelect({ name, label, helperText, children, ...props }: RHFSe
       render={({ field, fieldState }) => (
         <FormControl fullWidth error={!!fieldState.error}>
           <InputLabel id={labelId}>{label}</InputLabel>
-          <Select {...field} {...props} labelId={labelId} label={label}>
+          <Select
+            {...field}
+            {...props}
+            labelId={labelId}
+            label={label}
+            value={field.value ?? ''}
+            onChange={(e, child) => {
+              // Coerce to number if the current field value is a number
+              const raw = e.target.value;
+              const coerced = typeof field.value === 'number' ? Number(raw) : raw;
+              field.onChange(coerced);
+              externalOnChange?.(e, child);
+            }}
+          >
             {children}
           </Select>
           <FormHelperText>
