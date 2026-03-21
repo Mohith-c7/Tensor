@@ -22,10 +22,20 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// Response interceptor: normalize success
+// Response interceptor: normalize success — unwrap { success, data } envelope
 apiClient.interceptors.response.use(
   (response) => {
-    response.data = parseDates(response.data);
+    // Unwrap backend envelope: { success: true, data: ..., message: ... }
+    if (
+      response.data &&
+      typeof response.data === 'object' &&
+      'success' in response.data &&
+      'data' in response.data
+    ) {
+      response.data = parseDates(response.data.data);
+    } else {
+      response.data = parseDates(response.data);
+    }
     return response;
   },
   (error: AxiosError) => {
@@ -70,18 +80,31 @@ export async function fetchPaginated<T>(
   params?: Record<string, unknown>,
   signal?: AbortSignal
 ): Promise<import('../types/api').PaginatedResponse<T>> {
-  const response = await apiClient.get<{
+  // The interceptor unwraps { success, data } → data (the array)
+  // but paginatedResponse puts pagination in meta, so we need the raw envelope
+  const response = await axios.get<{
+    success: boolean;
     data: T[];
-    pagination: { total: number; page: number; totalPages: number; limit: number };
-  }>(url, { params, signal });
+    meta: { pagination: { total: number; page: number; totalPages: number; limit: number } };
+  }>(url, {
+    baseURL: API_BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+    },
+    params,
+    signal,
+    timeout: 30_000,
+  });
 
-  const { data, pagination } = response.data;
+  const { data, meta } = response.data;
+  const pagination = meta?.pagination;
   return {
-    items: data,
-    total: pagination.total,
-    page: pagination.page,
-    totalPages: pagination.totalPages,
-    limit: pagination.limit,
+    items: parseDates(data) as T[],
+    total: pagination?.total ?? 0,
+    page: pagination?.page ?? 1,
+    totalPages: pagination?.totalPages ?? 1,
+    limit: pagination?.limit ?? 20,
   };
 }
 

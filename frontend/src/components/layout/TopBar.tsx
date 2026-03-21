@@ -51,8 +51,13 @@ export function TopBar({ title = 'Tensor', onMenuClick, showMenuButton = false }
     mode === 'light' ? 'Switch to dark mode' : mode === 'dark' ? 'Switch to system mode' : 'Switch to light mode';
 
   const initials = user
-    ? `${user.email.charAt(0).toUpperCase()}`
+    ? user.firstName
+      ? `${user.firstName.charAt(0)}${user.lastName.charAt(0) ?? ''}`.toUpperCase()
+      : user.email.charAt(0).toUpperCase()
     : '?';
+
+  const displayName = user?.fullName ?? user?.email ?? '';
+  const displayRole = user ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
 
   return (
     <AppBar position="sticky" color="surface" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
@@ -100,8 +105,18 @@ export function TopBar({ title = 'Tensor', onMenuClick, showMenuButton = false }
           aria-haspopup="true"
           aria-expanded={anchorEl ? 'true' : undefined}
           onClick={handleUserMenuOpen}
-          sx={{ ml: 1 }}
+          sx={{ ml: 1, borderRadius: 2, px: 1, gap: 1 }}
         >
+          {user && (
+            <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
+              <Typography variant="body2" fontWeight="medium" lineHeight={1.2}>
+                {displayName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" lineHeight={1.2}>
+                {displayRole}
+              </Typography>
+            </Box>
+          )}
           <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 14 }}>
             {initials}
           </Avatar>

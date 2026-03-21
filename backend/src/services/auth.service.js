@@ -70,7 +70,7 @@ class AuthService {
    */
   generateToken(user) {
     return jwt.sign(
-      { id: user.id, role: user.role, email: user.email },
+      { userId: user.id, role: user.role, email: user.email },
       config.jwtSecret,
       {
         expiresIn: config.jwtExpiresIn || '24h',

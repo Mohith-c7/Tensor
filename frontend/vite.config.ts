@@ -31,11 +31,13 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 250,
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            mui: ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
-            query: ['@tanstack/react-query'],
-            charts: ['recharts'],
+        manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('@mui')) return 'mui';
+              if (id.includes('recharts')) return 'charts';
+              if (id.includes('@tanstack')) return 'query';
+              if (id.includes('react-router') || id.includes('react-dom') || id.includes('/react/')) return 'vendor';
+            }
           },
         },
       },

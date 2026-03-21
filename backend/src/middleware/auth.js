@@ -27,9 +27,12 @@ function authenticate(req, res, next) {
   const token = authHeader.slice(7); // Remove "Bearer "
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const decoded = jwt.verify(token, config.jwtSecret, {
+      issuer: 'tensor-school-erp',
+      audience: 'tensor-api'
+    });
     req.user = {
-      id: decoded.id,
+      id: decoded.userId,
       role: decoded.role,
       email: decoded.email
     };

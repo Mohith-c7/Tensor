@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/guards/ProtectedRoute';
 import { AuthLayout } from '../components/layout/AuthLayout';
+import { AppShellLayout } from '../components/layout/AppShellLayout';
 import { ROUTES } from './routes';
 import { handles } from './handles';
 
@@ -36,8 +37,6 @@ const TeacherTimetablePage = lazy(() => import('../pages/timetable/TeacherTimeta
 const NotFoundPage = lazy(() => import('../pages/errors/NotFoundPage'));
 const ForbiddenPage = lazy(() => import('../pages/errors/ForbiddenPage'));
 
-const AppShellLayout = lazy(() => import('../components/layout/AppShellLayout').then(m => ({ default: m.AppShellLayout })));
-
 const PageSkeleton = () => (
   <div role="status" aria-label="Loading page" style={{ minHeight: '100vh' }} />
 );
@@ -57,7 +56,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: withSuspense(
+    element: (
       <ProtectedRoute>
         <AppShellLayout />
       </ProtectedRoute>

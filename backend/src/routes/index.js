@@ -10,6 +10,8 @@ const attendanceRoutes = require('./attendance.routes');
 const feeRoutes = require('./fee.routes');
 const examRoutes = require('./exam.routes');
 const timetableRoutes = require('./timetable.routes');
+const dashboardRoutes = require('./dashboard.routes');
+const classesRoutes = require('./classes.routes');
 
 const router = Router();
 
@@ -19,5 +21,7 @@ router.use('/attendance', attendanceRoutes);
 router.use('/fees', feeRoutes);
 router.use('/exams', examRoutes);
 router.use('/timetable', timetableRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/classes', classesRoutes);
 
 module.exports = router;

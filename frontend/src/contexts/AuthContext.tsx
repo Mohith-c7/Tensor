@@ -6,8 +6,10 @@ import {
   clearSession,
   decodeToken,
   getToken,
+  getUserMeta,
   isNearExpiry,
   storeToken,
+  storeUserMeta,
 } from '../services/authService';
 import { API_BASE_URL } from '../config/env';
 
@@ -15,6 +17,9 @@ interface AuthUser {
   userId: number;
   role: 'admin' | 'teacher';
   email: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
 }
 
 interface AuthContextValue {
@@ -43,8 +48,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStatus('unauthenticated');
       return;
     }
+    const meta = getUserMeta();
+    const firstName = meta?.firstName ?? '';
+    const lastName = meta?.lastName ?? '';
     setToken(jwt);
-    setUser({ userId: decoded.userId, role: decoded.role, email: decoded.email });
+    setUser({
+      userId: decoded.userId,
+      role: decoded.role,
+      email: decoded.email,
+      firstName,
+      lastName,
+      fullName: `${firstName} ${lastName}`.trim() || decoded.email,
+    });
     setStatus('authenticated');
   }, []);
 
@@ -103,9 +118,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!res.ok) {
       throw new Error('Invalid email or password');
     }
-    const data = await res.json() as { token: string };
-    storeToken(data.token);
-    setAuthenticated(data.token);
+    const data = await res.json() as { data: { token: string; user: { firstName: string; lastName: string } } };
+    storeToken(data.data.token);
+    storeUserMeta(data.data.user.firstName, data.data.user.lastName);
+    setAuthenticated(data.data.token);
   }, [setAuthenticated]);
 
   const logout = useCallback(() => {

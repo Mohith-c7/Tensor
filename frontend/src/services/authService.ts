@@ -1,10 +1,24 @@
 import type { DecodedToken } from '../types/api';
 
 const TOKEN_KEY = 'auth_token';
+const USER_KEY = 'auth_user';
 const EXPIRY_BUFFER_MS = 5 * 60 * 1000; // 5 minutes
 
 export function storeToken(token: string): void {
   sessionStorage.setItem(TOKEN_KEY, token);
+}
+
+export function storeUserMeta(firstName: string, lastName: string): void {
+  sessionStorage.setItem(USER_KEY, JSON.stringify({ firstName, lastName }));
+}
+
+export function getUserMeta(): { firstName: string; lastName: string } | null {
+  try {
+    const raw = sessionStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function getToken(): string | null {

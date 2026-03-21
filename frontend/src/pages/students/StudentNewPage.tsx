@@ -8,6 +8,7 @@ import { RHFTextField } from '../../components/forms/RHFTextField';
 import { RHFSelect } from '../../components/forms/RHFSelect';
 import { RHFDatePicker } from '../../components/forms/RHFDatePicker';
 import { useCreateStudent } from '../../hooks/useStudents';
+import { useClasses, useSections } from '../../hooks/useClasses';
 import { useToast } from '../../hooks/useToast';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges';
 import { studentFullSchema, type StudentFullFormData } from '../../schemas/studentSchemas';
@@ -44,7 +45,11 @@ export default function StudentNewPage() {
     mode: 'onTouched',
   });
 
-  const { handleSubmit, trigger, formState: { isDirty, isSubmitting } } = methods;
+  const { handleSubmit, trigger, watch, setValue, formState: { isDirty, isSubmitting } } = methods;
+  const selectedClassId = watch('classId');
+
+  const { data: classes = [] } = useClasses();
+  const { data: sections = [] } = useSections(Number(selectedClassId) || 0);
 
   useUnsavedChanges(isDirty && !isSubmitting);
 
@@ -119,8 +124,32 @@ export default function StudentNewPage() {
           )}
           {step === 2 && (
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}><RHFTextField name="classId" label="Class ID" type="number" fullWidth required /></Grid>
-              <Grid item xs={12} sm={6}><RHFTextField name="sectionId" label="Section ID" type="number" fullWidth required /></Grid>
+              <Grid item xs={12} sm={6}>
+                <RHFSelect
+                  name="classId"
+                  label="Class"
+                  fullWidth
+                  required
+                  onChange={() => setValue('sectionId', 0)}
+                >
+                  {classes.map((c) => (
+                    <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+                  ))}
+                </RHFSelect>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <RHFSelect
+                  name="sectionId"
+                  label="Section"
+                  fullWidth
+                  required
+                  disabled={!selectedClassId || sections.length === 0}
+                >
+                  {sections.map((s) => (
+                    <MenuItem key={s.id} value={s.id}>Section {s.name}</MenuItem>
+                  ))}
+                </RHFSelect>
+              </Grid>
               <Grid item xs={12} sm={6}><RHFDatePicker name="admissionDate" label="Admission Date" fullWidth required /></Grid>
             </Grid>
           )}

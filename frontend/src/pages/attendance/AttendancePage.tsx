@@ -7,11 +7,16 @@ import {
   Alert,
   CircularProgress,
   Stack,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { AttendanceGrid } from '../../components/data-display/AttendanceGrid';
 import { PageHeader } from '../../components/common/PageHeader';
 import { SkeletonLoader } from '../../components/feedback/SkeletonLoader';
 import { useClassAttendance, useMarkAttendance } from '../../hooks/useAttendance';
+import { useClasses, useSections } from '../../hooks/useClasses';
 import { useToast } from '../../hooks/useToast';
 import type { AttendanceStatus } from '../../types/api';
 import { toApiDate } from '../../services/prettyPrinter';
@@ -35,6 +40,9 @@ export default function AttendancePage() {
   const [sectionId, setSectionId] = useState('');
   const [date, setDate] = useState(todayStr());
   const [rows, setRows] = useState<AttendanceRow[]>([]);
+
+  const { data: classes = [] } = useClasses();
+  const { data: sections = [] } = useSections(Number(classId) || 0);
 
   const isToday = date === todayStr();
   const isFuture = date > todayStr();
@@ -92,22 +100,32 @@ export default function AttendancePage() {
       <PageHeader title="Mark Attendance" />
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
-        <TextField
-          label="Class ID"
-          value={classId}
-          onChange={(e) => setClassId(e.target.value)}
-          size="small"
-          type="number"
-          sx={{ width: 120 }}
-        />
-        <TextField
-          label="Section ID"
-          value={sectionId}
-          onChange={(e) => setSectionId(e.target.value)}
-          size="small"
-          type="number"
-          sx={{ width: 120 }}
-        />
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <InputLabel>Class</InputLabel>
+          <Select
+            label="Class"
+            value={classId}
+            onChange={(e) => { setClassId(e.target.value); setSectionId(''); }}
+          >
+            {classes.map((c) => (
+              <MenuItem key={c.id} value={String(c.id)}>{c.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 140 }} disabled={!classId || sections.length === 0}>
+          <InputLabel>Section</InputLabel>
+          <Select
+            label="Section"
+            value={sectionId}
+            onChange={(e) => setSectionId(e.target.value)}
+          >
+            {sections.map((s) => (
+              <MenuItem key={s.id} value={String(s.id)}>Section {s.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <TextField
           label="Date"
           value={date}
