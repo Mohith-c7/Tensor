@@ -87,4 +87,17 @@ router.get('/pending',
   }
 );
 
+// GET /api/v1/fees/class/:classId/summary
+router.get('/class/:classId/summary',
+  teacherOrAdmin,
+  validate(Joi.object({ classId: Joi.number().integer().positive().required() }), 'params'),
+  validate(Joi.object({ year: Joi.string().pattern(/^\d{4}-\d{4}$/).optional() }), 'query'),
+  async (req, res, next) => {
+    try {
+      const summary = await feeService.getClassFeesSummary(req.params.classId, req.query);
+      res.status(200).json(successResponse(summary));
+    } catch (err) { next(err); }
+  }
+);
+
 module.exports = router;

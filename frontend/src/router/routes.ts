@@ -20,6 +20,7 @@ export const ROUTES = {
   FEES_PAYMENT_NEW: '/fees/payments/new',
   FEES_STUDENT: '/fees/student/:id',
   FEES_PENDING: '/fees/pending',
+  FEES_CLASS: '/fees/class',
 
   EXAMS: '/exams',
   EXAM_NEW: '/exams/new',

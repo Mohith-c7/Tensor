@@ -46,6 +46,8 @@ export const queryKeys = {
     studentStatus: (studentId: number, year: string) =>
       [...queryKeys.fees.all, 'student', studentId, year] as const,
     pending: () => [...queryKeys.fees.all, 'pending'] as const,
+    classSummary: (classId: number | null, year: string) =>
+      [...queryKeys.fees.all, 'class-summary', classId, year] as const,
   },
   exams: {
     all: ['exams'] as const,

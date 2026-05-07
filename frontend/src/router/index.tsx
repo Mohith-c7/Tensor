@@ -24,6 +24,7 @@ const PaymentsPage = lazy(() => import('../pages/fees/PaymentsPage'));
 const PaymentNewPage = lazy(() => import('../pages/fees/PaymentNewPage'));
 const StudentFeePage = lazy(() => import('../pages/fees/StudentFeePage'));
 const PendingFeesPage = lazy(() => import('../pages/fees/PendingFeesPage'));
+const ClassFeesPage = lazy(() => import('../pages/fees/ClassFeesPage'));
 
 const ExamsPage = lazy(() => import('../pages/exams/ExamsPage'));
 const ExamNewPage = lazy(() => import('../pages/exams/ExamNewPage'));
@@ -153,6 +154,11 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         handle: handles.feesPending,
+      },
+      {
+        path: ROUTES.FEES_CLASS,
+        element: withSuspense(<ClassFeesPage />),
+        handle: handles.feesClass,
       },
 
       // Exams

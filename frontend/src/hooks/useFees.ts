@@ -68,3 +68,18 @@ export function useRecordPayment() {
     },
   });
 }
+
+export function useClassFeesSummary(classId: number | null, academicYear: string) {
+  return useQuery({
+    queryKey: queryKeys.fees.classSummary(classId, academicYear),
+    queryFn: async ({ signal }) => {
+      if (!classId) return null;
+      const res = await apiClient.get(`/fees/class/${classId}/summary`, {
+        params: { year: academicYear },
+        signal,
+      });
+      return res.data;
+    },
+    enabled: !!classId && !!academicYear,
+  });
+}

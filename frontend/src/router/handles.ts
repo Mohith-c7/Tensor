@@ -44,6 +44,9 @@ export const handles: Record<string, RouteHandle> = {
   feesPending: {
     breadcrumb: () => 'Pending Fees',
   },
+  feesClass: {
+    breadcrumb: () => 'Class-wise Fees',
+  },
   exams: {
     breadcrumb: () => 'Exams',
   },

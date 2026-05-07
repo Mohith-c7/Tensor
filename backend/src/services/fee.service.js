@@ -207,6 +207,67 @@ class FeeService {
     };
   }
 
+  /**
+   * Get class fees summary with all students
+   */
+  async getClassFeesSummary(classId, { academicYear } = {}) {
+    // Get fee structure for the class
+    let structQuery = supabase
+      .from('fee_structures')
+      .select('*')
+      .eq('class_id', classId);
+    
+    if (academicYear) structQuery = structQuery.eq('academic_year', academicYear);
+    
+    const { data: structures } = await structQuery.limit(1);
+    const feeStructure = structures && structures.length > 0 ? this._fmtStructure(structures[0]) : null;
+
+    // Get all active students in the class
+    const { data: students, error } = await supabase
+      .from('students')
+      .select('id, admission_no, first_name, last_name')
+      .eq('class_id', classId)
+      .eq('is_active', true)
+      .order('admission_no');
+
+    if (error) throw new DatabaseError('Failed to fetch students');
+
+    // Get payment details for each student
+    const studentDetails = await Promise.all((students || []).map(async (student) => {
+      let payQuery = supabase
+        .from('fee_payments')
+        .select('amount')
+        .eq('student_id', student.id);
+      
+      if (academicYear) payQuery = payQuery.eq('academic_year', academicYear);
+      
+      const { data: payments } = await payQuery;
+
+      const totalFee = feeStructure ? feeStructure.totalFee : 0;
+      const totalPaid = (payments || []).reduce((sum, p) => sum + parseFloat(p.amount), 0);
+      const outstandingBalance = totalFee - totalPaid;
+
+      let paymentStatus = 'unpaid';
+      if (totalPaid >= totalFee) paymentStatus = 'paid';
+      else if (totalPaid > 0) paymentStatus = 'partial';
+
+      return {
+        studentId: student.id,
+        admissionNo: student.admission_no,
+        fullName: `${student.first_name} ${student.last_name}`,
+        totalFee: parseFloat(totalFee.toFixed(2)),
+        totalPaid: parseFloat(totalPaid.toFixed(2)),
+        outstandingBalance: parseFloat(outstandingBalance.toFixed(2)),
+        paymentStatus
+      };
+    }));
+
+    return {
+      feeStructure,
+      students: studentDetails
+    };
+  }
+
   _fmtStructure(s) {
     return {
       id: s.id,
