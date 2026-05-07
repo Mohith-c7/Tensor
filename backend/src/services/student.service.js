@@ -94,14 +94,14 @@ class StudentService {
 
   /**
    * Get paginated list of students with optional filters
-   * @param {Object} options - { page, limit, classId, sectionId, search, isActive }
+   * @param {Object} options - { page, limit, classId, sectionId, gender, search, isActive }
    * @returns {Promise<{data: Array, pagination: Object}>}
    */
-  async getStudents({ page = 1, limit, classId, sectionId, search, isActive } = {}) {
+  async getStudents({ page = 1, limit, classId, sectionId, gender, search, isActive } = {}) {
     const pageSize = Math.min(limit || config.defaultPageSize, config.maxPageSize);
     const offset = (page - 1) * pageSize;
 
-    const cacheKey = `${CACHE_LIST_PREFIX}:${JSON.stringify({ page, pageSize, classId, sectionId, search, isActive })}`;
+    const cacheKey = `${CACHE_LIST_PREFIX}:${JSON.stringify({ page, pageSize, classId, sectionId, gender, search, isActive })}`;
     const cached = cache.get(cacheKey);
     if (cached) return cached;
 
@@ -111,6 +111,7 @@ class StudentService {
 
     if (classId) query = query.eq('class_id', classId);
     if (sectionId) query = query.eq('section_id', sectionId);
+    if (gender) query = query.eq('gender', gender);
     if (isActive !== undefined) query = query.eq('is_active', isActive);
     if (search) {
       query = query.or(

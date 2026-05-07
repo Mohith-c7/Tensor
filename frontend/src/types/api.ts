@@ -69,6 +69,7 @@ export interface StudentListParams {
   limit?: number;
   classId?: number;
   sectionId?: number;
+  gender?: 'male' | 'female' | 'other';
   isActive?: boolean;
   search?: string;
   sortBy?: 'firstName' | 'admissionNo' | 'admissionDate';

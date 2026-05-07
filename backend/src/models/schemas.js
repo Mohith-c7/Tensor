@@ -79,6 +79,7 @@ const studentQuerySchema = Joi.object({
   ...pagination,
   classId: id.optional(),
   sectionId: id.optional(),
+  gender: Joi.string().valid('male', 'female', 'other').optional(),
   isActive: Joi.boolean().optional(),
   search: Joi.string().max(100).trim().optional()
 });

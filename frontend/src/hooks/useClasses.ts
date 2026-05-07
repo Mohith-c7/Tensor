@@ -1,35 +1,42 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../services/apiClient';
 
-interface ClassOption {
+interface Class {
   id: number;
   name: string;
 }
 
-interface SectionOption {
+interface Section {
   id: number;
   name: string;
 }
 
+/**
+ * Hook to fetch all classes
+ */
 export function useClasses() {
   return useQuery({
     queryKey: ['classes'],
-    queryFn: async ({ signal }) => {
-      const res = await apiClient.get<ClassOption[]>('/classes', { signal });
-      return res.data as ClassOption[];
+    queryFn: async () => {
+      const response = await apiClient.get<{ data: Class[] }>('/classes');
+      return response.data.data || [];
     },
-    staleTime: 10 * 60 * 1000, // classes rarely change
+    staleTime: 10 * 60 * 1000, // 10 minutes - classes don't change often
   });
 }
 
-export function useSections(classId: number) {
+/**
+ * Hook to fetch sections for a specific class
+ */
+export function useSections(classId: number | null) {
   return useQuery({
-    queryKey: ['classes', classId, 'sections'],
-    queryFn: async ({ signal }) => {
-      const res = await apiClient.get<SectionOption[]>(`/classes/${classId}/sections`, { signal });
-      return res.data as SectionOption[];
+    queryKey: ['sections', classId],
+    queryFn: async () => {
+      if (!classId) return [];
+      const response = await apiClient.get<{ data: Section[] }>(`/classes/${classId}/sections`);
+      return response.data.data || [];
     },
-    enabled: classId > 0,
+    enabled: !!classId,
     staleTime: 10 * 60 * 1000,
   });
 }

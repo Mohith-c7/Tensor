@@ -9,9 +9,11 @@ import {
   InputLabel,
   Stack,
   Menu,
+  Chip,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useStudentList } from '../../hooks/useStudents';
+import { useClasses, useSections } from '../../hooks/useClasses';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useVirtualList } from '../../hooks/useVirtualList';
 import { DataTable } from '../../components/data-display/DataTable';
@@ -44,6 +46,9 @@ export default function StudentsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [classFilter, setClassFilter] = useState('');
+  const [sectionFilter, setSectionFilter] = useState('');
+  const [genderFilter, setGenderFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<StudentListParams['sortBy']>('firstName');
@@ -53,11 +58,18 @@ export default function StudentsPage() {
 
   const debouncedSearch = useDebounce(search, 300);
 
+  // Fetch classes and sections
+  const { data: classes } = useClasses();
+  const { data: sections } = useSections(classFilter ? Number(classFilter) : null);
+
   const params: StudentListParams = {
     page,
     limit: pageSize,
     search: debouncedSearch || undefined,
     classId: classFilter ? Number(classFilter) : undefined,
+    sectionId: sectionFilter ? Number(sectionFilter) : undefined,
+    gender: genderFilter ? (genderFilter as 'male' | 'female' | 'other') : undefined,
+    isActive: statusFilter ? statusFilter === 'active' : undefined,
     sortBy,
     sortOrder,
   };
@@ -66,6 +78,13 @@ export default function StudentsPage() {
   const { shouldVirtualize } = useVirtualList(data?.items ?? []);
 
   const students = data?.items ?? [];
+
+  // Reset section filter when class changes
+  const handleClassChange = (newClassId: string) => {
+    setClassFilter(newClassId);
+    setSectionFilter(''); // Clear section when class changes
+    setPage(1);
+  };
 
   const handleExportCsv = () => {
     exportToCsv(
@@ -92,8 +111,20 @@ export default function StudentsPage() {
   const clearFilters = () => {
     setSearch('');
     setClassFilter('');
+    setSectionFilter('');
+    setGenderFilter('');
+    setStatusFilter('');
     setPage(1);
   };
+
+  // Count active filters
+  const activeFilterCount = [
+    search,
+    classFilter,
+    sectionFilter,
+    genderFilter,
+    statusFilter,
+  ].filter(Boolean).length;
 
   const actions = (
     <Stack direction="row" spacing={1}>
@@ -131,6 +162,61 @@ export default function StudentsPage() {
           size="small"
           sx={{ minWidth: 260 }}
         />
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Class</InputLabel>
+          <Select
+            value={classFilter}
+            label="Class"
+            onChange={(e) => handleClassChange(e.target.value)}
+          >
+            <MenuItem value="">All Classes</MenuItem>
+            {classes?.map((cls) => (
+              <MenuItem key={cls.id} value={cls.id}>
+                {cls.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 150 }} disabled={!classFilter}>
+          <InputLabel>Section</InputLabel>
+          <Select
+            value={sectionFilter}
+            label="Section"
+            onChange={(e) => { setSectionFilter(e.target.value); setPage(1); }}
+          >
+            <MenuItem value="">All Sections</MenuItem>
+            {sections?.map((sec) => (
+              <MenuItem key={sec.id} value={sec.id}>
+                {sec.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Gender</InputLabel>
+          <Select
+            value={genderFilter}
+            label="Gender"
+            onChange={(e) => { setGenderFilter(e.target.value); setPage(1); }}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="male">Male</MenuItem>
+            <MenuItem value="female">Female</MenuItem>
+            <MenuItem value="other">Other</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={statusFilter}
+            label="Status"
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Sort by</InputLabel>
           <Select
@@ -154,6 +240,55 @@ export default function StudentsPage() {
           </Select>
         </FormControl>
       </Stack>
+
+      {/* Active Filters Display */}
+      {activeFilterCount > 0 && (
+        <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
+          {search && (
+            <Chip
+              label={`Search: "${search}"`}
+              onDelete={() => { setSearch(''); setPage(1); }}
+              size="small"
+            />
+          )}
+          {classFilter && (
+            <Chip
+              label={`Class: ${classes?.find((c) => c.id === Number(classFilter))?.name}`}
+              onDelete={() => handleClassChange('')}
+              size="small"
+            />
+          )}
+          {sectionFilter && (
+            <Chip
+              label={`Section: ${sections?.find((s) => s.id === Number(sectionFilter))?.name}`}
+              onDelete={() => { setSectionFilter(''); setPage(1); }}
+              size="small"
+            />
+          )}
+          {genderFilter && (
+            <Chip
+              label={`Gender: ${genderFilter.charAt(0).toUpperCase() + genderFilter.slice(1)}`}
+              onDelete={() => { setGenderFilter(''); setPage(1); }}
+              size="small"
+            />
+          )}
+          {statusFilter && (
+            <Chip
+              label={`Status: ${statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}`}
+              onDelete={() => { setStatusFilter(''); setPage(1); }}
+              size="small"
+            />
+          )}
+          <Button
+            variant="text"
+            size="small"
+            onClick={clearFilters}
+            sx={{ ml: 1 }}
+          >
+            Clear All Filters
+          </Button>
+        </Stack>
+      )}
 
       {/* Table */}
       {isError ? (
