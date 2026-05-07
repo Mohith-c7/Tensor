@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
-import { Box, Typography, Tooltip, Grid } from '@mui/material';
+import { useState, useCallback, useMemo } from 'react';
+import { Box, Typography, Tooltip } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -32,7 +33,7 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export function AttendanceCalendar({ records, month }: AttendanceCalendarProps) {
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
 
-  const recordMap = React.useMemo(() => {
+  const recordMap = useMemo(() => {
     const map = new Map<string, AttendanceStatus>();
     for (const r of records) {
       map.set(format(r.date, 'yyyy-MM-dd'), r.status);

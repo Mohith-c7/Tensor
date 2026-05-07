@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Grid, Button, MenuItem, CircularProgress } from '@mui/material';
@@ -31,7 +30,13 @@ export default function PaymentNewPage() {
 
   const onSubmit = async (data: PaymentFormData) => {
     try {
-      const payment = await recordPayment.mutateAsync(data);
+      // Remove empty optional fields
+      const cleanData = {
+        ...data,
+        transactionId: data.transactionId?.trim() || undefined,
+        remarks: data.remarks?.trim() || undefined,
+      };
+      await recordPayment.mutateAsync(cleanData);
       showToast({
         variant: 'success',
         message: `Payment of ${data.amount} recorded for student #${data.studentId}`,

@@ -211,12 +211,15 @@ export interface ApiResponse<T> {
 }
 
 export class ApiError extends Error {
-  constructor(
-    public status: number,
-    public message: string,
-    public code?: string,
-  ) {
+  status: number;
+  message: string;
+  code?: string;
+
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
+    this.message = message;
+    this.code = code;
   }
 }

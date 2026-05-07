@@ -1,4 +1,3 @@
-import React from 'react';
 import { Snackbar, Alert, Button } from '@mui/material';
 import type { Toast as ToastType } from '../../types/domain';
 

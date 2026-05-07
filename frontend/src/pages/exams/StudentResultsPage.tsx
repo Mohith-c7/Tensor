@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Chip } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DataTable } from '../../components/data-display/DataTable';
@@ -6,7 +5,6 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { SkeletonLoader } from '../../components/feedback/SkeletonLoader';
 import { useStudentResults } from '../../hooks/useExams';
 import { validatePositiveInt } from '../../utils/routeParamValidator';
-import { calculateGrade } from '../../utils/gradeCalculator';
 import { ROUTES } from '../../router/routes';
 import type { Mark } from '../../types/api';
 import type { ColumnDef } from '../../types/domain';

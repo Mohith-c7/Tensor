@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';

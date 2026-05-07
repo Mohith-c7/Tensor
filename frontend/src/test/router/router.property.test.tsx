@@ -1,11 +1,10 @@
 /**
  * Property-based tests for route guards.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import * as fc from 'fast-check';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import React from 'react';
 
 // Mock useAuth
 const mockUseAuth = vi.fn();

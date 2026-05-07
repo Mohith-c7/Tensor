@@ -24,26 +24,26 @@ jest.mock('../../src/config/database', () => ({
 const jwt = require('jsonwebtoken');
 const authService = require('../../src/services/auth.service');
 
-describe('AuthService - generateToken', () => {
+describe('AuthService - generateAccessToken', () => {
   it('generates a valid JWT with user payload', () => {
     const user = { id: 1, role: 'admin', email: 'admin@test.com' };
-    const token = authService.generateToken(user);
+    const token = authService.generateAccessToken(user);
     expect(typeof token).toBe('string');
     expect(token.split('.')).toHaveLength(3);
   });
 
-  it('token contains correct user id and role', () => {
+  it('token contains correct userId and role', () => {
     const user = { id: 42, role: 'teacher', email: 'teacher@test.com' };
-    const token = authService.generateToken(user);
+    const token = authService.generateAccessToken(user);
     const decoded = jwt.decode(token);
-    expect(decoded.id).toBe(42);
+    expect(decoded.userId).toBe(42);
     expect(decoded.role).toBe('teacher');
     expect(decoded.email).toBe('teacher@test.com');
   });
 
   it('token has issuer and audience claims', () => {
     const user = { id: 1, role: 'admin', email: 'a@b.com' };
-    const token = authService.generateToken(user);
+    const token = authService.generateAccessToken(user);
     const decoded = jwt.decode(token);
     expect(decoded.iss).toBe('tensor-school-erp');
     expect(decoded.aud).toBe('tensor-api');
@@ -51,7 +51,7 @@ describe('AuthService - generateToken', () => {
 
   it('token expires in approximately 24 hours', () => {
     const user = { id: 1, role: 'admin', email: 'a@b.com' };
-    const token = authService.generateToken(user);
+    const token = authService.generateAccessToken(user);
     const decoded = jwt.decode(token);
     const expectedExpiry = Math.floor(Date.now() / 1000) + 24 * 3600;
     expect(decoded.exp).toBeGreaterThan(expectedExpiry - 60);
@@ -62,9 +62,9 @@ describe('AuthService - generateToken', () => {
 describe('AuthService - verifyToken', () => {
   it('verifies a valid token and returns payload', () => {
     const user = { id: 1, role: 'admin', email: 'a@b.com' };
-    const token = authService.generateToken(user);
+    const token = authService.generateAccessToken(user);
     const payload = authService.verifyToken(token);
-    expect(payload.id).toBe(1);
+    expect(payload.userId).toBe(1);
     expect(payload.role).toBe('admin');
   });
 

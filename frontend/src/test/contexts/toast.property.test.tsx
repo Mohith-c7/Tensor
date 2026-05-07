@@ -6,7 +6,6 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 import { renderHook, act } from '@testing-library/react';
-import React from 'react';
 import { ToastProvider, useToastContext } from '../../contexts/ToastContext';
 import type { ToastVariant } from '../../types/domain';
 

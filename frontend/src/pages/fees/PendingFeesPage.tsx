@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Button } from '@mui/material';
 import { DataTable } from '../../components/data-display/DataTable';
 import { PageHeader } from '../../components/common/PageHeader';
@@ -26,7 +25,11 @@ export default function PendingFeesPage() {
         totalPaid: s.totalPaid,
         outstanding: s.outstandingBalance,
       })),
-      ['totalFee', 'totalPaid', 'outstanding']
+      [
+        { key: 'totalFee', label: 'Total Fee' },
+        { key: 'totalPaid', label: 'Total Paid' },
+        { key: 'outstanding', label: 'Outstanding' }
+      ]
     );
   };
 
@@ -43,7 +46,7 @@ export default function PendingFeesPage() {
         columns={COLUMNS}
         data={pending ?? []}
         loading={isLoading}
-        getRowKey={(_, i) => i}
+        getRowKey={(row) => `${row.totalFee}-${row.totalPaid}`}
       />
     </Box>
   );

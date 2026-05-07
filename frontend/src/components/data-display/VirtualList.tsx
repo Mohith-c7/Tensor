@@ -1,4 +1,3 @@
-import React from 'react';
 import { FixedSizeList, type ListChildComponentProps } from 'react-window';
 
 interface VirtualListProps<T> {

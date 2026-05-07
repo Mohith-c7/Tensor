@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface ExternalLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string;

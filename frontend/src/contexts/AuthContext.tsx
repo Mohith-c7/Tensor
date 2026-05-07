@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { DecodedToken, LoginRequest } from '../types/api';
 import type { AuthStatus } from '../types/domain';
@@ -34,7 +35,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>('initializing');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -118,10 +119,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!res.ok) {
       throw new Error('Invalid email or password');
     }
-    const data = await res.json() as { data: { token: string; user: { firstName: string; lastName: string } } };
-    storeToken(data.data.token);
+    const data = await res.json() as { data: { accessToken: string; user: { firstName: string; lastName: string } } };
+    storeToken(data.data.accessToken);
     storeUserMeta(data.data.user.firstName, data.data.user.lastName);
-    setAuthenticated(data.data.token);
+    setAuthenticated(data.data.accessToken);
   }, [setAuthenticated]);
 
   const logout = useCallback(() => {

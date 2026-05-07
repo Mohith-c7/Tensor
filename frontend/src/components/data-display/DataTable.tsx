@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -36,7 +36,7 @@ export function DataTable<T>({
   onSelectionChange,
   getRowKey,
 }: DataTableProps<T>) {
-  const [selected, setSelected] = React.useState<Set<string | number>>(new Set());
+  const [selected, setSelected] = useState<Set<string | number>>(new Set());
 
   const toggleRow = (key: string | number) => {
     const next = new Set(selected);

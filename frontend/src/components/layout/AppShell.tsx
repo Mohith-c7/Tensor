@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Box, useMediaQuery, useTheme as useMuiTheme } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
 import { NavDrawer } from './NavDrawer';
@@ -10,7 +10,7 @@ import type { NavItem } from '../../types/domain';
 
 interface AppShellProps {
   navItems: NavItem[];
-  children: React.ReactNode;
+  children: ReactNode;
   pageTitle?: string;
 }
 

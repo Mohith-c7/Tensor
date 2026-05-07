@@ -1,4 +1,3 @@
-import React from 'react';
 import { Breadcrumbs, Link, Typography } from '@mui/material';
 import { useMatches, Link as RouterLink } from 'react-router-dom';
 import type { RouteHandle } from '../../types/domain';

@@ -38,7 +38,7 @@ export function useMarkAttendance() {
       const res = await apiClient.post<AttendanceRecord[]>('/attendance', payload);
       return res.data;
     },
-    onMutate: async (payload) => {
+    onMutate: async () => {
       // Snapshot for rollback
       const snapshot = qc.getQueriesData({ queryKey: queryKeys.attendance.all });
       return { snapshot };

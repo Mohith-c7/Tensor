@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  Box, Typography, Alert, Button, Chip, Divider, Stack, Grid,
+  Box, Typography, Alert, Button, Chip, Divider, Grid,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from '../../components/data-display/DataTable';

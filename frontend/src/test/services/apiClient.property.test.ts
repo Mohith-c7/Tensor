@@ -105,7 +105,8 @@ describe('Property 13: API Serializer Round-Trip', () => {
           // Deserialize: ISO string → Date (via parseDates)
           const result = parseDates(isoString);
           expect(result).toBeInstanceOf(Date);
-          expect((result as Date).getTime()).toBe(date.getTime());
+          const resultDate = result as unknown as Date;
+          expect(resultDate.getTime()).toBe(date.getTime());
         }
       )
     );
@@ -122,10 +123,18 @@ describe('Property 13: API Serializer Round-Trip', () => {
             name: nonDateStr,
             nested: { updatedAt: date.toISOString() },
           };
-          const result = parseDates(obj) as typeof obj;
-          expect(result.createdAt).toBeInstanceOf(Date);
-          expect(result.name).toBe(nonDateStr);
-          expect((result.nested as { updatedAt: Date }).updatedAt).toBeInstanceOf(Date);
+          const result = parseDates(obj);
+          expect(result).toHaveProperty('createdAt');
+          expect(result).toHaveProperty('name');
+          expect(result).toHaveProperty('nested');
+          if (typeof result === 'object' && result !== null) {
+            const typedResult = result as Record<string, unknown>;
+            expect(typedResult.createdAt).toBeInstanceOf(Date);
+            expect(typedResult.name).toBe(nonDateStr);
+            if (typeof typedResult.nested === 'object' && typedResult.nested !== null) {
+              expect((typedResult.nested as Record<string, unknown>).updatedAt).toBeInstanceOf(Date);
+            }
+          }
         }
       )
     );

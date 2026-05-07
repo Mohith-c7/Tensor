@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Button, Typography, CircularProgress } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MarksTable } from '../../components/data-display/MarksTable';

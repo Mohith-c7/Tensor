@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -60,7 +60,7 @@ export function TopBar({ title = 'Tensor', onMenuClick, showMenuButton = false }
   const displayRole = user ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
 
   return (
-    <AppBar position="sticky" color="surface" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+    <AppBar position="sticky" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
       <Toolbar>
         {showMenuButton && (
           <IconButton

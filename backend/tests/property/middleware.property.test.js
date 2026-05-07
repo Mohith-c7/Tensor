@@ -47,7 +47,12 @@ function makeRes() {
 function makeNext() { return jest.fn(); }
 
 function signToken(payload, secret = 'test-secret-key-for-property-tests', opts = {}) {
-  return jwt.sign(payload, secret, { expiresIn: '1h', ...opts });
+  return jwt.sign(payload, secret, { 
+    expiresIn: '1h',
+    issuer: 'tensor-school-erp',
+    audience: 'tensor-api',
+    ...opts 
+  });
 }
 
 // ─── Property 4: JWT Token Verification ───────────────────────────────────────
@@ -57,7 +62,7 @@ describe('Property 4: JWT Token Verification', () => {
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.integer({ min: 1, max: 99999 }),
+          userId: fc.integer({ min: 1, max: 99999 }),
           role: fc.constantFrom('admin', 'teacher'),
           email: fc.emailAddress()
         }),
@@ -68,7 +73,7 @@ describe('Property 4: JWT Token Verification', () => {
           const next = makeNext();
           authenticate(req, res, next);
           expect(next).toHaveBeenCalledTimes(1);
-          expect(req.user.id).toBe(payload.id);
+          expect(req.user.id).toBe(payload.userId);
           expect(req.user.role).toBe(payload.role);
         }
       ),
@@ -107,7 +112,7 @@ describe('Property 4: JWT Token Verification', () => {
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.integer({ min: 1, max: 99999 }),
+          userId: fc.integer({ min: 1, max: 99999 }),
           role: fc.constantFrom('admin', 'teacher'),
           email: fc.emailAddress()
         }),
@@ -127,7 +132,7 @@ describe('Property 4: JWT Token Verification', () => {
   });
 
   it('expired tokens always return 401 TOKEN_EXPIRED', (done) => {
-    const token = signToken({ id: 1, role: 'admin', email: 'a@b.com' },
+    const token = signToken({ userId: 1, role: 'admin', email: 'a@b.com' },
       'test-secret-key-for-property-tests', { expiresIn: '0s' });
     setTimeout(() => {
       const req = makeReq({ headers: { authorization: `Bearer ${token}` } });

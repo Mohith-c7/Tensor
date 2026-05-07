@@ -4,7 +4,6 @@ import {
   studentContactSchema,
   studentAcademicSchema,
   studentParentSchema,
-  studentFullSchema,
 } from '../../schemas/studentSchemas';
 import { feeStructureSchema, paymentSchema } from '../../schemas/feeSchemas';
 import { examSchema, marksEntrySchema } from '../../schemas/examSchemas';

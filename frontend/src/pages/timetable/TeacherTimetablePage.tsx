@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { TimetableGrid } from '../../components/data-display/TimetableGrid';
@@ -55,8 +54,7 @@ function TeacherTimetableContent({ id, resolvedId }: { id?: string; resolvedId: 
 
       {!isLoading && !isError && (!entries || entries.length === 0) && (
         <EmptyState
-          title="No timetable entries"
-          description="No classes have been scheduled for this teacher yet."
+          message="No classes have been scheduled for this teacher yet."
         />
       )}
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Button, TextField, MenuItem, Select, FormControl, InputLabel, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from '../../components/data-display/DataTable';
@@ -7,7 +7,7 @@ import { PermissionGate } from '../../components/guards/PermissionGate';
 import { useExamList } from '../../hooks/useExams';
 import { formatDate } from '../../services/prettyPrinter';
 import { buildPath, ROUTES } from '../../router/routes';
-import type { Exam, ExamType } from '../../types/api';
+import type { Exam } from '../../types/api';
 import type { ColumnDef } from '../../types/domain';
 
 const COLUMNS: ColumnDef<Exam>[] = [

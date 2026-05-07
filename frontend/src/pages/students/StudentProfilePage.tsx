@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Grid,
@@ -13,7 +13,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStudent, useDeleteStudent } from '../../hooks/useStudents';
 import { useToast } from '../../hooks/useToast';
-import { useAuth } from '../../hooks/useAuth';
 import { validatePositiveInt } from '../../utils/routeParamValidator';
 import { buildPath, ROUTES } from '../../router/routes';
 import { PageHeader } from '../../components/common/PageHeader';

@@ -1,11 +1,18 @@
 import type { DecodedToken } from '../types/api';
 
-const TOKEN_KEY = 'auth_token';
+const ACCESS_TOKEN_KEY = 'auth_access_token';
+const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const USER_KEY = 'auth_user';
 const EXPIRY_BUFFER_MS = 5 * 60 * 1000; // 5 minutes
 
+export function storeTokens(accessToken: string, refreshToken: string): void {
+  sessionStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken); // Refresh token in localStorage (more persistent)
+}
+
 export function storeToken(token: string): void {
-  sessionStorage.setItem(TOKEN_KEY, token);
+  // Legacy support - store as access token
+  sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
 }
 
 export function storeUserMeta(firstName: string, lastName: string): void {
@@ -21,12 +28,22 @@ export function getUserMeta(): { firstName: string; lastName: string } | null {
   }
 }
 
+export function getAccessToken(): string | null {
+  return sessionStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
 export function getToken(): string | null {
-  return sessionStorage.getItem(TOKEN_KEY);
+  // Legacy support - return access token
+  return getAccessToken();
 }
 
 export function clearSession(): void {
   sessionStorage.clear();
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 export function decodeToken(token: string): DecodedToken | null {

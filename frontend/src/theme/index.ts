@@ -1,7 +1,7 @@
 // CssVarsProvider Theme Export
 // Requirements: 3.1, 3.2
 
-import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
+import { extendTheme } from '@mui/material/styles';
 import { colorTokens, motionTokens } from './tokens';
 import { typographyScale } from './typography';
 import { components } from './components';

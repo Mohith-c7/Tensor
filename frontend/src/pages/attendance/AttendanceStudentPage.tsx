@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Grid, Typography, TextField, Stack, Paper } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AttendanceCalendar } from '../../components/data-display/AttendanceCalendar';
@@ -29,7 +29,7 @@ export default function AttendanceStudentPage() {
   const id = validatePositiveInt(idParam);
 
   const today = new Date();
-  const [month, setMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [month] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [startDate, setStartDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
   );

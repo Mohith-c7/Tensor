@@ -1,4 +1,3 @@
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Checkbox, FormControlLabel, type CheckboxProps } from '@mui/material';
 

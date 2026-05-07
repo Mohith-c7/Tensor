@@ -12,20 +12,25 @@ export function initSentry(): void {
     dsn: SENTRY_DSN,
     environment: APP_ENV,
     tracesSampleRate: APP_ENV === 'production' ? 0.2 : 1.0,
-    beforeSend(event, hint) {
+    beforeSend(event, _hint) {
       // Include role context but strip userId / PII
       if (event.user) {
         const { role } = event.user as { role?: string };
         event.user = role ? { role } : {};
       }
-      // Strip Authorization headers from breadcrumbs
-      if (event.breadcrumbs?.values) {
-        event.breadcrumbs.values = event.breadcrumbs.values.map((b) => {
-          if (b.data?.['Authorization']) {
-            b.data = { ...b.data, Authorization: '[Filtered]' };
-          }
-          return b;
-        });
+      // Strip Authorization headers from breadcrumbs (if present)
+      // Note: Sentry breadcrumbs structure may vary, so we handle gracefully
+      try {
+        if (event.breadcrumbs && Array.isArray(event.breadcrumbs)) {
+          event.breadcrumbs = event.breadcrumbs.map((b) => {
+            if (b.data && typeof b.data === 'object' && 'Authorization' in b.data) {
+              return { ...b, data: { ...b.data, Authorization: '[Filtered]' } };
+            }
+            return b;
+          });
+        }
+      } catch {
+        // Ignore breadcrumb filtering errors
       }
       return event;
     },

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Skeleton, Box } from '@mui/material';
 
 type SkeletonVariant = 'kpi-card' | 'table-row' | 'chart' | 'list-item';

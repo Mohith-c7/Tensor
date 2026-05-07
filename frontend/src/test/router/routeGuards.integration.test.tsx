@@ -5,7 +5,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import React from 'react';
 
 const mockUseAuth = vi.fn();
 vi.mock('../../hooks/useAuth', () => ({ useAuth: () => mockUseAuth() }));

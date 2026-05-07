@@ -95,7 +95,7 @@ docker build -t tensor-backend .
 
 ## API Reference
 
-All endpoints are prefixed with `/api/v1`. Authentication uses Bearer tokens.
+All endpoints are prefixed with `/api/v1`. Authentication uses Bearer tokens in the format: `Authorization: Bearer <token>`
 
 ### Authentication
 
@@ -103,6 +103,28 @@ All endpoints are prefixed with `/api/v1`. Authentication uses Bearer tokens.
 |---|---|---|---|
 | POST | `/auth/login` | Login with email/password | No |
 | POST | `/auth/verify` | Verify token validity | Yes |
+| POST | `/auth/refresh` | Refresh access token | No |
+| POST | `/auth/logout` | Logout (revoke refresh token) | Yes |
+| POST | `/auth/forgot-password` | Request password reset | No |
+| POST | `/auth/reset-password` | Reset password with token | No |
+| POST | `/auth/change-password` | Change password (authenticated) | Yes |
+| POST | `/auth/revoke-all` | Revoke all sessions | Yes |
+
+### Dashboard
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| GET | `/dashboard/kpis` | Get key performance indicators | Any |
+| GET | `/dashboard/attendance-trend` | Get attendance trends (last 7 days) | Any |
+| GET | `/dashboard/fee-collection` | Get fee collection statistics | Any |
+| GET | `/dashboard/recent-activity` | Get recent activity log | Any |
+
+### Classes & Sections
+
+| Method | Endpoint | Description | Role |
+|---|---|---|---|
+| GET | `/classes` | List all classes | Any |
+| GET | `/classes/:id/sections` | List sections for a class | Any |
 
 ### Students
 
@@ -152,6 +174,131 @@ All endpoints are prefixed with `/api/v1`. Authentication uses Bearer tokens.
 | GET | `/timetable/teacher/:teacherId` | Teacher timetable | Any |
 | PUT | `/timetable/:id` | Update entry | Admin |
 | DELETE | `/timetable/:id` | Delete entry | Admin |
+
+---
+
+## Authentication
+
+### Login Flow
+
+1. **Login**: POST `/api/v1/auth/login`
+```json
+{
+  "email": "admin@tensorschool.com",
+  "password": "password"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+    "user": {
+      "id": 1,
+      "email": "admin@tensorschool.com",
+      "role": "admin",
+      "firstName": "Admin",
+      "lastName": "User"
+    }
+  },
+  "message": "Login successful"
+}
+```
+
+2. **Use Access Token**: Include in Authorization header
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+3. **Refresh Token**: When access token expires (24h)
+```json
+POST /api/v1/auth/refresh
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+### Password Reset Flow
+
+1. **Request Reset**: POST `/api/v1/auth/forgot-password`
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+2. **Reset Password**: POST `/api/v1/auth/reset-password`
+```json
+{
+  "token": "reset-token-from-email",
+  "newPassword": "newSecurePassword123"
+}
+```
+
+3. **Change Password** (authenticated): POST `/api/v1/auth/change-password`
+```json
+{
+  "oldPassword": "currentPassword",
+  "newPassword": "newSecurePassword123"
+}
+```
+
+---
+
+## Response Format
+
+### Success Response
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Operation successful"
+}
+```
+
+### Paginated Response
+```json
+{
+  "success": true,
+  "data": [ ... ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 150,
+    "totalPages": 8
+  }
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Validation failed",
+    "code": "VALIDATION_ERROR",
+    "details": [
+      {
+        "field": "email",
+        "message": "Invalid email format"
+      }
+    ]
+  }
+}
+```
+
+### HTTP Status Codes
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request (validation error)
+- `401` - Unauthorized (invalid/missing token)
+- `403` - Forbidden (insufficient permissions)
+- `404` - Not Found
+- `429` - Too Many Requests (rate limit exceeded)
+- `500` - Internal Server Error
 
 ---
 

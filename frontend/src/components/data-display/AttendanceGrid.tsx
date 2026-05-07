@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   Box,
   Button,
@@ -13,7 +13,7 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import type { AttendanceRecord, AttendanceStatus } from '../../types/api';
+import type { AttendanceStatus } from '../../types/api';
 
 interface AttendanceRow {
   studentId: number;

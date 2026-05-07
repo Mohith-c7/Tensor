@@ -24,6 +24,24 @@ const loginSchema = Joi.object({
   password: Joi.string().min(6).max(128).required()
 });
 
+const forgotPasswordSchema = Joi.object({
+  email: email.required()
+});
+
+const resetPasswordSchema = Joi.object({
+  token: Joi.string().required(),
+  newPassword: Joi.string().min(8).max(128).required()
+});
+
+const changePasswordSchema = Joi.object({
+  oldPassword: Joi.string().min(6).max(128).required(),
+  newPassword: Joi.string().min(8).max(128).required()
+});
+
+const refreshTokenSchema = Joi.object({
+  refreshToken: Joi.string().required()
+});
+
 // ─── Students ─────────────────────────────────────────────────────────────────
 
 const createStudentSchema = Joi.object({
@@ -118,8 +136,8 @@ const feePaymentSchema = Joi.object({
   paymentDate: dateStr.required(),
   paymentMethod: Joi.string()
     .valid('cash', 'card', 'bank_transfer', 'cheque', 'online').required(),
-  transactionId: Joi.string().max(100).trim().optional(),
-  remarks: Joi.string().max(500).trim().optional()
+  transactionId: Joi.string().max(100).trim().allow('').optional(),
+  remarks: Joi.string().max(500).trim().allow('').optional()
 });
 
 const createExamSchema = Joi.object({
@@ -216,6 +234,10 @@ const teacherIdParamSchema = Joi.object({
 module.exports = {
   // Auth
   loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  refreshTokenSchema,
   // Students
   createStudentSchema,
   updateStudentSchema,

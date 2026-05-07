@@ -1,16 +1,13 @@
-import React from 'react';
 import { Button, Typography, Box } from '@mui/material';
-
-interface ErrorFallbackProps {
-  error: Error;
-  resetErrorBoundary: () => void;
-}
+import type { FallbackProps } from 'react-error-boundary';
 
 /**
  * Error boundary fallback component.
  * Requirements: 12.4, 12.5
  */
-export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+  
   return (
     <Box
       role="alert"
@@ -20,7 +17,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps)
         Something went wrong
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        {error.message}
+        {errorMessage}
       </Typography>
       <Button variant="contained" onClick={resetErrorBoundary}>
         Reload Section

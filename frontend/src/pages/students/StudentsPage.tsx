@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -11,7 +11,7 @@ import {
   Menu,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useStudentList, useDeleteStudent } from '../../hooks/useStudents';
+import { useStudentList } from '../../hooks/useStudents';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useVirtualList } from '../../hooks/useVirtualList';
 import { DataTable } from '../../components/data-display/DataTable';
@@ -47,7 +47,7 @@ export default function StudentsPage() {
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<StudentListParams['sortBy']>('firstName');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, _setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selected, setSelected] = useState<Student[]>([]);
   const [bulkMenuAnchor, setBulkMenuAnchor] = useState<null | HTMLElement>(null);
 
@@ -78,7 +78,14 @@ export default function StudentsPage() {
         gender: s.gender,
         status: s.isActive ? 'Active' : 'Inactive',
       })),
-      ['admissionNo', 'name', 'class', 'section', 'gender', 'status']
+      [
+        { key: 'admissionNo', label: 'Admission No' },
+        { key: 'name', label: 'Name' },
+        { key: 'class', label: 'Class' },
+        { key: 'section', label: 'Section' },
+        { key: 'gender', label: 'Gender' },
+        { key: 'status', label: 'Status' },
+      ]
     );
   };
 

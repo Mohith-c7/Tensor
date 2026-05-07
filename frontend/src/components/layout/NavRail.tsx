@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';

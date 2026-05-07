@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Grid, MenuItem, Button, CircularProgress } from '@mui/material';
@@ -14,7 +13,6 @@ import { validatePositiveInt } from '../../utils/routeParamValidator';
 import { buildPath, ROUTES } from '../../router/routes';
 import { PageHeader } from '../../components/common/PageHeader';
 import { SkeletonLoader } from '../../components/feedback/SkeletonLoader';
-import { formatDate } from '../../services/prettyPrinter';
 
 /**
  * Student edit page — pre-populates form with existing data.
