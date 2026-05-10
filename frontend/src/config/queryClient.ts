@@ -34,10 +34,12 @@ export const queryKeys = {
   },
   attendance: {
     all: ['attendance'] as const,
-    class: (classId: number, sectionId: number, date: string) =>
-      [...queryKeys.attendance.all, 'class', classId, sectionId, date] as const,
+    class: (classId: number, sectionId: number, date: string, periodNumber?: number) =>
+      [...queryKeys.attendance.all, 'class', classId, sectionId, date, periodNumber] as const,
     student: (studentId: number, start: string, end: string) =>
       [...queryKeys.attendance.all, 'student', studentId, start, end] as const,
+    studentStats: (studentId: number, start: string, end: string, threshold?: number) =>
+      [...queryKeys.attendance.all, 'student-stats', studentId, start, end, threshold] as const,
   },
   fees: {
     all: ['fees'] as const,
@@ -45,7 +47,7 @@ export const queryKeys = {
     payments: () => [...queryKeys.fees.all, 'payments'] as const,
     studentStatus: (studentId: number, year: string) =>
       [...queryKeys.fees.all, 'student', studentId, year] as const,
-    pending: () => [...queryKeys.fees.all, 'pending'] as const,
+    pending: (year?: string) => [...queryKeys.fees.all, 'pending', year] as const,
     classSummary: (classId: number | null, year: string) =>
       [...queryKeys.fees.all, 'class-summary', classId, year] as const,
   },

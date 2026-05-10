@@ -122,3 +122,40 @@ describe('GET /api/v1/attendance/class', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('GET /api/v1/attendance/stats/:studentId', () => {
+  it('returns attendance statistics with percentage', async () => {
+    const startDate = '2024-01-01';
+    const endDate = '2024-12-31';
+
+    const res = await request(app)
+      .get(`/api/v1/attendance/stats/${testStudentId}?startDate=${startDate}&endDate=${endDate}&threshold=75`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toHaveProperty('student');
+    expect(res.body.data).toHaveProperty('period');
+    expect(res.body.data).toHaveProperty('attendance');
+    expect(res.body.data.attendance).toHaveProperty('percentage');
+    expect(res.body.data.attendance).toHaveProperty('present');
+    expect(res.body.data.attendance).toHaveProperty('totalScheduled');
+    expect(typeof res.body.data.attendance.percentage).toBe('number');
+  });
+
+  it('returns 400 when dates are missing', async () => {
+    const res = await request(app)
+      .get(`/api/v1/attendance/stats/${testStudentId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 404 for non-existent student', async () => {
+    const res = await request(app)
+      .get(`/api/v1/attendance/stats/99999?startDate=2024-01-01&endDate=2024-12-31`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(404);
+  });
+});

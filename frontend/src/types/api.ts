@@ -86,6 +86,8 @@ export interface AttendanceRecord {
   admissionNo: string;
   date: Date;
   status: AttendanceStatus;
+  periodNumber: number;
+  subject?: string;
   remarks?: string;
 }
 
@@ -94,17 +96,36 @@ export interface MarkAttendanceRequest {
     studentId: number;
     date: string; // ISO date
     status: AttendanceStatus;
+    periodNumber: number;
+    subject?: string;
     remarks?: string;
   }>;
 }
 
 export interface AttendanceStats {
-  totalDays: number;
-  present: number;
-  absent: number;
-  late: number;
-  excused: number;
-  percentage: number;
+  student: {
+    id: number;
+    name: string;
+    admissionNo: string;
+  };
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  attendance: {
+    percentage: number;
+    present: number;
+    totalScheduled: number;
+    totalMarked: number;
+    absent: number;
+    late: number;
+    excused: number;
+  };
+  alerts: Array<{
+    type: string;
+    message: string;
+    severity: 'warning' | 'error' | 'info';
+  }>;
 }
 
 // ── Fees ──────────────────────────────────────────────────────────────────
@@ -132,11 +153,48 @@ export interface FeePayment {
 }
 
 export interface StudentFeeStatus {
-  feeStructure: FeeStructure | null;
-  totalFee: number;
-  totalPaid: number;
-  outstandingBalance: number;
-  payments: FeePayment[];
+  student: {
+    id: number;
+    name: string;
+    admissionNo: string;
+  };
+  academicYear: string;
+  feeStructure: {
+    totalFee: number;
+    tuitionFee: number;
+    transportFee: number;
+    activityFee: number;
+    otherFee: number;
+  };
+  payments: {
+    totalPaid: number;
+    count: number;
+    lastPayment: FeePayment | null;
+    history: FeePayment[];
+  };
+  status: {
+    currentBalance: number;
+    overdueAmount: number;
+    nextInstallmentDue: number;
+    isOverdue: boolean;
+    paymentStatus: 'paid' | 'pending' | 'overdue';
+  };
+}
+
+export interface PendingFeesReport {
+  academicYear: string;
+  totalPendingStudents: number;
+  totalPendingAmount: number;
+  pendingFees: Array<{
+    studentId: number;
+    studentName: string;
+    admissionNo: string;
+    className: string;
+    totalFee: number;
+    totalPaid: number;
+    balance: number;
+    academicYear: string;
+  }>;
 }
 
 // ── Exams ─────────────────────────────────────────────────────────────────
@@ -166,16 +224,47 @@ export interface Mark {
   remarks?: string;
   grade: LetterGrade;
   isPassed: boolean;
+  percentage: number;
+  rank?: number;
+  enteredBy?: string;
 }
 
 export interface ExamStatistics {
+  totalStudents: number;
   average: number;
   highest: number;
   lowest: number;
   passCount: number;
   failCount: number;
   passPercentage: number;
-  distribution: Array<{ range: string; count: number }>;
+  distribution: Record<string, number>;
+}
+
+export interface StudentExamResults {
+  studentId: number;
+  resultsByType: Record<string, {
+    examType: string;
+    exams: Mark[];
+    totalMarks: number;
+    totalMaxMarks: number;
+    averagePercentage: number;
+    passedCount: number;
+  }>;
+  overallStats: {
+    totalExams: number;
+    totalMarks: number;
+    totalMaxMarks: number;
+    passedExams: number;
+    failedExams: number;
+    averagePercentage: number;
+  };
+}
+
+export interface ExamResults {
+  examId: number;
+  exam: Exam;
+  results: Mark[];
+  statistics: ExamStatistics;
 }
 
 // ── Timetable ─────────────────────────────────────────────────────────────

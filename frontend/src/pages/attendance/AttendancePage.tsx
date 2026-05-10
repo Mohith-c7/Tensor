@@ -17,6 +17,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { SkeletonLoader } from '../../components/feedback/SkeletonLoader';
 import { useClassAttendance, useMarkAttendance } from '../../hooks/useAttendance';
 import { useClasses, useSections } from '../../hooks/useClasses';
+import { useClassTimetable } from '../../hooks/useTimetable';
 import { useToast } from '../../hooks/useToast';
 import type { AttendanceStatus } from '../../types/api';
 import { toApiDate } from '../../services/prettyPrinter';
@@ -30,6 +31,11 @@ interface AttendanceRow {
 
 const todayStr = () => new Date().toISOString().split('T')[0];
 
+const getDayOfWeek = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleLowerCase('en-US', { weekday: 'long' });
+};
+
 /**
  * Class attendance marking page.
  * Requirements: 7.1, 7.2, 7.5, 7.6, 7.10, 7.11, 7.12
@@ -39,10 +45,16 @@ export default function AttendancePage() {
   const [classId, setClassId] = useState('');
   const [sectionId, setSectionId] = useState('');
   const [date, setDate] = useState(todayStr());
+  const [periodNumber, setPeriodNumber] = useState('');
   const [rows, setRows] = useState<AttendanceRow[]>([]);
 
   const { data: classes = [] } = useClasses();
   const { data: sections = [] } = useSections(Number(classId) || 0);
+  const { data: timetable = [] } = useClassTimetable(Number(classId) || 0, Number(sectionId) || 0);
+
+  const dayOfWeek = getDayOfWeek(date);
+  const dayPeriods = timetable.filter(t => t.dayOfWeek === dayOfWeek);
+  const selectedPeriod = dayPeriods.find(p => p.periodNumber === Number(periodNumber));
 
   const isToday = date === todayStr();
   const isFuture = date > todayStr();
@@ -50,7 +62,8 @@ export default function AttendancePage() {
   const { data: existing, isLoading, isError, refetch } = useClassAttendance(
     Number(classId) || 0,
     Number(sectionId) || 0,
-    date
+    date,
+    Number(periodNumber) || 0
   );
 
   const markAttendance = useMarkAttendance();
@@ -78,22 +91,25 @@ export default function AttendancePage() {
   };
 
   const handleSubmit = async () => {
-    if (rows.length === 0) return;
+    if (rows.length === 0 || !periodNumber) return;
     try {
       await markAttendance.mutateAsync({
         records: rows.map((r) => ({
           studentId: r.studentId,
           date: toApiDate(new Date(date)),
           status: r.status,
+          periodNumber: Number(periodNumber),
+          subject: selectedPeriod?.subject,
         })),
       });
       showToast({ variant: 'success', message: `Attendance saved for ${rows.length} students` });
+      refetch();
     } catch {
       showToast({ variant: 'error', message: 'Failed to save attendance. Please retry.' });
     }
   };
 
-  const selectionComplete = classId && sectionId && date;
+  const selectionComplete = classId && sectionId && date && periodNumber;
 
   return (
     <Box>
@@ -129,12 +145,28 @@ export default function AttendancePage() {
         <TextField
           label="Date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => { setDate(e.target.value); setPeriodNumber(''); setRows([]); }}
           size="small"
           type="date"
           InputLabelProps={{ shrink: true }}
           sx={{ width: 180 }}
         />
+
+        <FormControl size="small" sx={{ minWidth: 140 }} disabled={!classId || !sectionId || dayPeriods.length === 0}>
+          <InputLabel>Period</InputLabel>
+          <Select
+            label="Period"
+            value={periodNumber}
+            onChange={(e) => { setPeriodNumber(e.target.value); setRows([]); }}
+          >
+            {dayPeriods.map((p) => (
+              <MenuItem key={p.periodNumber} value={String(p.periodNumber)}>
+                Period {p.periodNumber} - {p.subject} ({p.startTime}-{p.endTime})
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         {isToday && (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography variant="caption" color="primary" fontWeight="bold">Today</Typography>

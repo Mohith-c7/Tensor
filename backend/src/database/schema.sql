@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS attendance (
   id SERIAL PRIMARY KEY,
   student_id INTEGER NOT NULL,
   date DATE NOT NULL,
+  period_number INTEGER NOT NULL DEFAULT 1,
   status VARCHAR(20) NOT NULL CHECK (status IN ('present', 'absent', 'late', 'excused')),
   remarks TEXT,
   marked_by INTEGER NOT NULL,
@@ -96,7 +97,7 @@ CREATE TABLE IF NOT EXISTS attendance (
   FOREIGN KEY (marked_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_attendance_student_date ON attendance(student_id, date);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_attendance_student_date_period ON attendance(student_id, date, period_number);
 CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(date);
 CREATE INDEX IF NOT EXISTS idx_attendance_status ON attendance(status);
 

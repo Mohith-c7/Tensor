@@ -3,12 +3,14 @@ import { queryKeys } from '../config/queryClient';
 import { apiClient } from '../services/apiClient';
 import type { AttendanceRecord, MarkAttendanceRequest } from '../types/api';
 
-export function useClassAttendance(classId: number, sectionId: number, date: string) {
+export function useClassAttendance(classId: number, sectionId: number, date: string, periodNumber?: number) {
   return useQuery({
-    queryKey: queryKeys.attendance.class(classId, sectionId, date),
+    queryKey: queryKeys.attendance.class(classId, sectionId, date, periodNumber),
     queryFn: async ({ signal }) => {
+      const params: any = { classId, sectionId, date };
+      if (periodNumber) params.periodNumber = periodNumber;
       const res = await apiClient.get<AttendanceRecord[]>('/attendance/class', {
-        params: { classId, sectionId, date },
+        params,
         signal,
       });
       return res.data;
@@ -17,17 +19,17 @@ export function useClassAttendance(classId: number, sectionId: number, date: str
   });
 }
 
-export function useStudentAttendance(studentId: number, start: string, end: string) {
+export function useStudentAttendanceStats(studentId: number, startDate: string, endDate: string, threshold?: number) {
   return useQuery({
-    queryKey: queryKeys.attendance.student(studentId, start, end),
+    queryKey: queryKeys.attendance.studentStats(studentId, startDate, endDate, threshold),
     queryFn: async ({ signal }) => {
-      const res = await apiClient.get<AttendanceRecord[]>(`/attendance/student/${studentId}`, {
-        params: { start, end },
+      const res = await apiClient.get<AttendanceStats>(`/attendance/stats/${studentId}`, {
+        params: { startDate, endDate, threshold },
         signal,
       });
       return res.data;
     },
-    enabled: studentId > 0 && !!start && !!end,
+    enabled: studentId > 0 && !!startDate && !!endDate,
   });
 }
 

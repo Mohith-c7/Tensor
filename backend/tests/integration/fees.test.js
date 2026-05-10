@@ -142,6 +142,31 @@ describe('GET /api/v1/fees/student/:studentId', () => {
     expect(res.body.data.summary).toHaveProperty('totalPaid');
     expect(res.body.data.summary).toHaveProperty('balance');
   });
+
+  it('returns detailed student fee status with balance and overdue info', async () => {
+    const res = await request(app)
+      .get(`/api/v1/fees/student/${testStudentId}?academicYear=${TEST_YEAR}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toHaveProperty('student');
+    expect(res.body.data).toHaveProperty('structures');
+    expect(res.body.data).toHaveProperty('payments');
+    expect(res.body.data).toHaveProperty('summary');
+    expect(res.body.data.summary).toHaveProperty('totalDue');
+    expect(res.body.data.summary).toHaveProperty('totalPaid');
+    expect(res.body.data.summary).toHaveProperty('balance');
+    expect(res.body.data.summary).toHaveProperty('isPaid');
+  });
+
+  it('returns 404 for non-existent student', async () => {
+    const res = await request(app)
+      .get(`/api/v1/fees/student/99999?academicYear=${TEST_YEAR}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(404);
+  });
 });
 
 describe('GET /api/v1/fees/pending', () => {
@@ -155,3 +180,5 @@ describe('GET /api/v1/fees/pending', () => {
     expect(Array.isArray(res.body.data)).toBe(true);
   });
 });
+
+

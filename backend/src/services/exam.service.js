@@ -129,6 +129,15 @@ class ExamService {
    * Get all exam results for a student
    */
   async getStudentResults(studentId, { examType, classId, page = 1, limit } = {}) {
+    // Validate student exists
+    const { data: student, error: sErr } = await supabase
+      .from('students')
+      .select('id')
+      .eq('id', studentId)
+      .single();
+
+    if (sErr || !student) throw new NotFoundError('Student');
+
     const pageSize = Math.min(limit || config.defaultPageSize, config.maxPageSize);
     const offset = (page - 1) * pageSize;
 

@@ -20,7 +20,7 @@ const PAYMENT_COLUMNS: ColumnDef<FeePayment>[] = [
   { key: 'transactionId', header: 'Transaction ID', render: (p) => p.transactionId ?? '—' },
 ];
 
-const currentYear = `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
+const currentYear = new Date().getFullYear().toString();
 
 /** Requirements: 8.7, 8.9, 8.11 */
 export default function StudentFeePage() {
@@ -38,19 +38,15 @@ export default function StudentFeePage() {
 
   if (isLoading) return <SkeletonLoader variant="table-row" count={6} />;
 
-  const paymentColor =
-    !feeStatus || feeStatus.outstandingBalance === feeStatus.totalFee
-      ? 'error'
-      : feeStatus.outstandingBalance === 0
-      ? 'success'
-      : 'warning';
+  const paymentColor = feeStatus?.status.paymentStatus === 'paid' ? 'success' :
+                      feeStatus?.status.paymentStatus === 'overdue' ? 'error' : 'warning';
 
-  const paymentLabel =
-    paymentColor === 'success' ? 'Fully Paid' : paymentColor === 'warning' ? 'Partially Paid' : 'No Payment';
+  const paymentLabel = feeStatus?.status.paymentStatus === 'paid' ? 'Fully Paid' :
+                      feeStatus?.status.paymentStatus === 'overdue' ? 'Overdue' : 'Pending';
 
   return (
     <Box>
-      <PageHeader title={`Fee Status — Student #${id}`} />
+      <PageHeader title={`Fee Status — ${feeStatus?.student.name ?? `Student #${id}`}`} />
 
       {!feeStatus?.feeStructure && (
         <Alert
@@ -66,36 +62,57 @@ export default function StudentFeePage() {
         </Alert>
       )}
 
+      {feeStatus?.status.isOverdue && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          This student's fees are overdue. Outstanding amount: {formatCurrency(feeStatus.status.overdueAmount)}
+        </Alert>
+      )}
+
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
             <Typography variant="caption" color="text.secondary">Total Fee</Typography>
-            <Typography variant="h6">{formatCurrency(feeStatus?.totalFee ?? 0)}</Typography>
+            <Typography variant="h6">{formatCurrency(feeStatus?.feeStructure.totalFee ?? 0)}</Typography>
           </Box>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
             <Typography variant="caption" color="text.secondary">Total Paid</Typography>
-            <Typography variant="h6">{formatCurrency(feeStatus?.totalPaid ?? 0)}</Typography>
+            <Typography variant="h6">{formatCurrency(feeStatus?.payments.totalPaid ?? 0)}</Typography>
           </Box>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-            <Typography variant="caption" color="text.secondary">Outstanding</Typography>
+            <Typography variant="caption" color="text.secondary">Current Balance</Typography>
             <Typography variant="h6" color={`${paymentColor}.main`}>
-              {formatCurrency(feeStatus?.outstandingBalance ?? 0)}
+              {formatCurrency(feeStatus?.status.currentBalance ?? 0)}
             </Typography>
-            <Chip label={paymentLabel} color={paymentColor} size="small" sx={{ mt: 0.5 }} />
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+            <Typography variant="caption" color="text.secondary">Next Installment</Typography>
+            <Typography variant="h6">{formatCurrency(feeStatus?.status.nextInstallmentDue ?? 0)}</Typography>
           </Box>
         </Grid>
       </Grid>
 
-      <Typography variant="subtitle2" gutterBottom>Payment History</Typography>
+      <Box sx={{ mb: 2 }}>
+        <Chip label={paymentLabel} color={paymentColor} size="small" />
+        {feeStatus?.payments.lastPayment && (
+          <Typography variant="caption" sx={{ ml: 2 }}>
+            Last payment: {formatDate(feeStatus.payments.lastPayment.paymentDate)} ({formatCurrency(feeStatus.payments.lastPayment.amount)})
+          </Typography>
+        )}
+      </Box>
+
+      <Typography variant="subtitle2" gutterBottom>Payment History ({feeStatus?.payments.count ?? 0} payments)</Typography>
       <Divider sx={{ mb: 2 }} />
       <DataTable
         columns={PAYMENT_COLUMNS}
-        data={feeStatus?.payments ?? []}
+        data={feeStatus?.payments.history ?? []}
         getRowKey={(p) => p.id}
+        emptyMessage="No payments recorded yet"
       />
     </Box>
   );

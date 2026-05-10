@@ -13,6 +13,7 @@ let testSectionId;
 let testStudentId;
 let testExamId;
 let testMarkId;
+const TEST_YEAR = '2099-2100'; // unique year to avoid conflicts
 
 beforeAll(async () => {
   const res = await request(app).post('/api/v1/auth/login').send(ADMIN);
@@ -156,6 +157,58 @@ describe('GET /api/v1/exams/:examId/results', () => {
     expect(res.body.data).toHaveProperty('results');
     expect(res.body.data.statistics).toHaveProperty('average');
     expect(res.body.data.statistics).toHaveProperty('passRate');
+  });
+
+  it('returns 404 for non-existent exam', async () => {
+    const res = await request(app)
+      .get('/api/v1/exams/999999999/results')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(404);
+  });
+});
+
+describe('GET /api/v1/exams/student/:studentId', () => {
+  it('returns student exam results with grades and analytics', async () => {
+    const res = await request(app)
+      .get(`/api/v1/exams/student/${testStudentId}?academicYear=${TEST_YEAR}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    if (res.body.data.length > 0) {
+      expect(res.body.data[0]).toHaveProperty('exam');
+      expect(res.body.data[0]).toHaveProperty('marksObtained');
+      expect(res.body.data[0]).toHaveProperty('percentage');
+      expect(res.body.data[0]).toHaveProperty('passed');
+    }
+  });
+
+  it('returns 404 for non-existent student', async () => {
+    const res = await request(app)
+      .get(`/api/v1/exams/student/99999?academicYear=${TEST_YEAR}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(404);
+  });
+});
+
+describe('GET /api/v1/exams/:examId/results', () => {
+  it('returns exam results with analytics for all students', async () => {
+    const res = await request(app)
+      .get(`/api/v1/exams/${testExamId}/results`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toHaveProperty('exam');
+    expect(res.body.data).toHaveProperty('results');
+    expect(res.body.data).toHaveProperty('statistics');
+    expect(Array.isArray(res.body.data.results)).toBe(true);
+    expect(res.body.data.statistics).toHaveProperty('average');
+    expect(res.body.data.statistics).toHaveProperty('passRate');
+    expect(res.body.data.statistics).toHaveProperty('totalStudents');
   });
 
   it('returns 404 for non-existent exam', async () => {

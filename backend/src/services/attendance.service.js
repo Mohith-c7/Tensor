@@ -78,25 +78,77 @@ class AttendanceService {
   /**
    * Get attendance statistics for a student
    */
-  async getAttendanceStats(studentId, { startDate, endDate } = {}) {
-    let query = supabase.from('attendance').select('status').eq('student_id', studentId);
-    if (startDate) query = query.gte('date', startDate);
-    if (endDate) query = query.lte('date', endDate);
+  async getAttendanceStats(studentId, { startDate, endDate, threshold = 75 } = {}) {
+    // Get student info
+    const { data: student, error: sErr } = await supabase
+      .from('students')
+      .select('id, first_name, last_name, admission_no, class_id')
+      .eq('id', studentId)
+      .single();
 
-    const { data, error } = await query;
-    if (error) throw new DatabaseError('Failed to fetch attendance statistics');
+    if (sErr || !student) throw new NotFoundError('Student');
 
-    const records = data || [];
-    const total = records.length;
-    const present = records.filter(r => r.status === 'present').length;
-    const absent = records.filter(r => r.status === 'absent').length;
-    const late = records.filter(r => r.status === 'late').length;
-    const excused = records.filter(r => r.status === 'excused').length;
+    // Get scheduled periods from timetable
+    let scheduledQuery = supabase
+      .from('timetable')
+      .select('id')
+      .eq('class_id', student.class_id);
+
+    if (startDate) scheduledQuery = scheduledQuery.gte('date', startDate);
+    if (endDate) scheduledQuery = scheduledQuery.lte('date', endDate);
+
+    const { data: scheduled, error: schErr } = await scheduledQuery;
+    if (schErr) throw new DatabaseError('Failed to fetch scheduled periods');
+
+    // Get actual attendance records
+    let attendanceQuery = supabase
+      .from('attendance')
+      .select('status, period_number')
+      .eq('student_id', studentId);
+
+    if (startDate) attendanceQuery = attendanceQuery.gte('date', startDate);
+    if (endDate) attendanceQuery = attendanceQuery.lte('date', endDate);
+
+    const { data: records, error: attErr } = await attendanceQuery;
+    if (attErr) throw new DatabaseError('Failed to fetch attendance records');
+
+    const totalScheduled = (scheduled || []).length;
+    const attendanceRecords = records || [];
+    const present = attendanceRecords.filter(r => r.status === 'present').length;
+    const late = attendanceRecords.filter(r => r.status === 'late').length;
+    const absent = attendanceRecords.filter(r => r.status === 'absent').length;
+    const excused = attendanceRecords.filter(r => r.status === 'excused').length;
+
+    const attended = present + late + excused; // Excused counts as attended
+    const percentage = totalScheduled > 0 ? parseFloat((attended / totalScheduled * 100).toFixed(2)) : 0;
+
+    // Generate alerts
+    const alerts = [];
+    if (percentage < threshold) {
+      alerts.push({
+        type: 'low_attendance',
+        message: `Attendance is below ${threshold}% (${percentage}%)`,
+        severity: percentage < 50 ? 'critical' : 'warning'
+      });
+    }
 
     return {
-      studentId, total, present, absent, late, excused,
-      attendancePercentage: total > 0 ? parseFloat(((present + late) / total * 100).toFixed(2)) : 0,
-      period: { startDate: startDate || null, endDate: endDate || null }
+      student: {
+        id: student.id,
+        name: `${student.first_name} ${student.last_name}`,
+        admissionNo: student.admission_no
+      },
+      period: { startDate: startDate || null, endDate: endDate || null },
+      attendance: {
+        percentage,
+        present,
+        late,
+        absent,
+        excused,
+        totalScheduled,
+        totalAttended: attended
+      },
+      alerts
     };
   }
 
