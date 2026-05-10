@@ -8,11 +8,13 @@ const cors = require('cors');
 const config = require('../config/index');
 const logger = require('../config/logger');
 
-// Parse comma-separated origins into an array
-const allowedOrigins = config.allowedOrigins
-  .split(',')
-  .map(o => o.trim())
-  .filter(Boolean);
+// Parse comma-separated origins into an array, or use an array directly
+const allowedOrigins = Array.isArray(config.allowedOrigins)
+  ? config.allowedOrigins
+  : String(config.allowedOrigins)
+      .split(',')
+      .map(o => o.trim())
+      .filter(Boolean);
 
 const corsOptions = {
   origin(origin, callback) {

@@ -87,14 +87,14 @@ export default function ClassFeesPage() {
 
   // Calculate overall statistics
   const totalStudents = feesSummary?.students?.length ?? 0;
-  const totalFeeAmount = feesSummary?.students?.reduce((sum, s) => sum + s.totalFee, 0) ?? 0;
-  const totalPaidAmount = feesSummary?.students?.reduce((sum, s) => sum + s.totalPaid, 0) ?? 0;
+  const totalFeeAmount = feesSummary?.students?.reduce((sum: number, s: StudentFeeDetail) => sum + s.totalFee, 0) ?? 0;
+  const totalPaidAmount = feesSummary?.students?.reduce((sum: number, s: StudentFeeDetail) => sum + s.totalPaid, 0) ?? 0;
   const totalOutstanding = totalFeeAmount - totalPaidAmount;
   const collectionPercentage = totalFeeAmount > 0 ? (totalPaidAmount / totalFeeAmount) * 100 : 0;
 
-  const fullyPaidCount = feesSummary?.students?.filter(s => s.outstandingBalance === 0).length ?? 0;
-  const partialPaidCount = feesSummary?.students?.filter(s => s.outstandingBalance > 0 && s.totalPaid > 0).length ?? 0;
-  const unpaidCount = feesSummary?.students?.filter(s => s.totalPaid === 0).length ?? 0;
+  const fullyPaidCount = feesSummary?.students?.filter((s: StudentFeeDetail) => s.outstandingBalance === 0).length ?? 0;
+  const partialPaidCount = feesSummary?.students?.filter((s: StudentFeeDetail) => s.outstandingBalance > 0 && s.totalPaid > 0).length ?? 0;
+  const unpaidCount = feesSummary?.students?.filter((s: StudentFeeDetail) => s.totalPaid === 0).length ?? 0;
 
   return (
     <Box>

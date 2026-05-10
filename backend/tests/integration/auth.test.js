@@ -7,7 +7,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 
 // Seed credentials from seed.sql
-const ADMIN = { email: 'admin@tensorschool.com', password: 'password' };
+const ADMIN = { email: 'admin@tensorschool.com', password: 'Admin@123' };
 
 describe('POST /api/v1/auth/login', () => {
   it('returns 200 with token on valid credentials', async () => {
@@ -17,7 +17,7 @@ describe('POST /api/v1/auth/login', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data).toHaveProperty('token');
+    expect(res.body.data).toHaveProperty('accessToken');
     expect(res.body.data).toHaveProperty('user');
     expect(res.body.data.user.email).toBe(ADMIN.email);
     expect(res.body.data.user).not.toHaveProperty('password_hash');
@@ -69,7 +69,7 @@ describe('POST /api/v1/auth/verify', () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send(ADMIN);
-    token = res.body.data.token;
+    token = res.body.data.accessToken || res.body.data.token;
   });
 
   it('returns 200 with user info on valid token', async () => {

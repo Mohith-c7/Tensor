@@ -6,7 +6,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 const { supabase } = require('../../src/config/database');
 
-const ADMIN = { email: 'admin@tensorschool.com', password: 'password' };
+const ADMIN = { email: 'admin@tensorschool.com', password: 'Admin@123' };
 let adminToken;
 let testClassId;
 let testStudentId;
@@ -15,7 +15,7 @@ const TEST_YEAR = '2099-2100'; // unique year to avoid conflicts
 
 beforeAll(async () => {
   const res = await request(app).post('/api/v1/auth/login').send(ADMIN);
-  adminToken = res.body.data.token;
+  adminToken = res.body.data.accessToken || res.body.data.token;
 
   const { data: cls } = await supabase.from('classes').select('id').limit(1).single();
   const { data: sec } = await supabase.from('sections').select('id').eq('class_id', cls.id).limit(1).single();

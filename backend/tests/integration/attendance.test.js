@@ -6,7 +6,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 const { supabase } = require('../../src/config/database');
 
-const ADMIN = { email: 'admin@tensorschool.com', password: 'password' };
+const ADMIN = { email: 'admin@tensorschool.com', password: 'Admin@123' };
 let adminToken;
 let testStudentId;
 let testClassId;
@@ -14,7 +14,7 @@ let testSectionId;
 
 beforeAll(async () => {
   const res = await request(app).post('/api/v1/auth/login').send(ADMIN);
-  adminToken = res.body.data.token;
+  adminToken = res.body.data.accessToken || res.body.data.token;
 
   // Get a class/section
   const { data: cls } = await supabase.from('classes').select('id').limit(1).single();
